@@ -1,0 +1,13 @@
+build
+.gradle
+local.properties
+.idea
+.DS_Store
+*/sign.gradle
+*/build
+*.iml
+app/src/main/assets/
+app/crashlytics.properties
+gradle.properties
+*.keystore
+key.properties

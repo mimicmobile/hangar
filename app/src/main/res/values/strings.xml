@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Hangar</string>
+    <string name="title_activity_main">Hangar</string>
+    <string name="toast_starting_job">Starting Hangar</string>
+    <string name="toast_no_permission">Hangar cannot run! No usage permission</string>
+</resources>
