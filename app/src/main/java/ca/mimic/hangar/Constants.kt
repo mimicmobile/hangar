@@ -19,8 +19,7 @@ class Constants {
             "com.google.android.packageinstaller",
             "com.android.systemui",
             "com.google.android.gms",
-            "ca.mimic.apphangar",
-            "ca.mimic.hangar"
+            "ca.mimic.apphangar"
         )
     }
 }
