@@ -9,7 +9,9 @@ abstract class IAppListWidgetView {
 }
 
 abstract class IAppearanceWidgetView {
+  bool loaded;
+
+  void refreshState();
 }
 
-abstract class IBehaviorWidgetView {
-}
+abstract class IBehaviorWidgetView {}

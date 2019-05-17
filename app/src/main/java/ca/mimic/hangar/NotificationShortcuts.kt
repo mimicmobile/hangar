@@ -16,6 +16,7 @@ import androidx.core.app.NotificationCompat.*
 import ca.mimic.hangar.Constants.Companion.EXTRA_PACKAGE_NAME
 import ca.mimic.hangar.Constants.Companion.NOTIFICATION_ID
 import ca.mimic.hangar.Constants.Companion.RECEIVER_APP_LAUNCHED
+import ca.mimic.hangar.Constants.Companion.SWITCH_APP_PACKAGE_NAME
 import kotlin.math.ceil
 
 class NotificationShortcuts(private val context: Context) {
@@ -24,8 +25,14 @@ class NotificationShortcuts(private val context: Context) {
 
     private val rows: MutableList<RemoteViews> = mutableListOf()
 
-    private val maxAppsPerRow = 7  // TODO: Settings
-    private val numOfRows = 2  // TODO: Settings
+    private val maxAppsPerRow = context.getSharedPreferences(Constants.PREFS_FILE, 0)
+        .getLong(Constants.PREF_APPS_PER_ROW, Constants.DEFAULT_APPS_PER_ROW).toInt()
+    private val numOfRows = context.getSharedPreferences(Constants.PREFS_FILE, 0)
+        .getLong(Constants.PREF_NUM_ROWS, Constants.DEFAULT_NUM_ROWS).toInt()
+    private val numOfPages = context.getSharedPreferences(Constants.PREFS_FILE, 0)
+        .getLong(Constants.PREF_NUM_PAGES, Constants.DEFAULT_NUM_PAGES).toInt()
+    private val currentPage = context.getSharedPreferences(Constants.PREFS_FILE, 0)
+        .getLong(Constants.PREF_CURRENT_PAGE, 1).toInt()
 
     private val appStorage: AppStorage by lazy {
         AppStorage(context)
@@ -33,18 +40,22 @@ class NotificationShortcuts(private val context: Context) {
 
     init {
         addRows()
-        val pinned = appStorage.apps.filter { it.pinned }.sortedByDescending { it.sortScore }
-        val maxApps = getMaxApps(reservedSpots = pinned.size)
-        appStorage.apps.filter { !it.blacklisted && !it.pinned }.sortedByDescending { it.sortScore }.take(maxApps)
-            .forEachIndexed { index, app ->
-                run {
-                    addApp(index, app)
-                }
-            }
-        pinned.forEachIndexed { index, app ->
-            run {
-                addApp(maxApps + index, app)
-            }
+        val maxApps = getMaxApps()
+        val startIndex: Int = maxApps * (currentPage - 1)
+
+        val sortedList: MutableList<App> = appStorage.apps.filter { it.pinned }.sortedByDescending { it.sortScore }.toMutableList()
+        val totalAppsToGet = (maxApps * numOfPages) - sortedList.size - pagePlaceholder(numOfPages)
+        sortedList.addAll(appStorage.apps.filter { !it.blacklisted && !it.pinned }.sortedByDescending { it.sortScore }
+            .take(totalAppsToGet))
+
+        var count = 0
+        for (i in startIndex until (startIndex + maxApps - pagePlaceholder(numOfPages))) {
+            val app: App = sortedList[i]
+            addApp(count, app)
+            count += 1
+        }
+        if (pagePlaceholder(numOfPages) > 0) {
+            addApp(count, App("Switch page", packageName=SWITCH_APP_PACKAGE_NAME))
         }
         createRootContainer()
     }
@@ -158,7 +169,7 @@ class NotificationShortcuts(private val context: Context) {
     }
 
     private fun setLaunchIntentForApp(app: App, appContainer: RemoteViews, context: Context) {
-        val intent = Intent(context, LaunchReceiver::class.java)
+        val intent = Intent(context, HangarReceiver::class.java)
             .putExtra(EXTRA_PACKAGE_NAME, app.packageName)
             .setAction(RECEIVER_APP_LAUNCHED)
 
@@ -175,8 +186,12 @@ class NotificationShortcuts(private val context: Context) {
         return rows.getOrNull(rowIndex)
     }
 
-    private fun getMaxApps(reservedSpots: Int): Int {
-        return (numOfRows * maxAppsPerRow) - reservedSpots
+    private fun getMaxApps(): Int {
+        return (numOfRows * maxAppsPerRow)
+    }
+
+    private fun pagePlaceholder(numOfPages: Int): Int {
+     return if (numOfPages > 1) 1 else 0
     }
 
 }

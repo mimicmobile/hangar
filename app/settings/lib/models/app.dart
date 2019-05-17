@@ -20,7 +20,8 @@ class App {
   bool pinned;
   bool blacklisted;
 
-  App(this.name,
+  App(
+      this.name,
       this.packageName,
       this.cachedIcon,
       this.isSystemApp,
@@ -55,32 +56,30 @@ class App {
 
   Widget rowWidget(context, cachePath, {Function onTapCallback}) {
     return Padding(
-      padding: const EdgeInsets.all(4.0),
+      padding: const EdgeInsets.all(8),
       child: Theme(
         data: Theme.of(context).copyWith(cardColor: Config.bottomNavBarColor),
         child: PopupMenuButton(
           offset: Offset(1, 0),
           onSelected: (s) => onTapCallback(packageName, s),
-          itemBuilder: (_) =>
-          <PopupMenuItem<String>>[
-            PopupMenuItem<String>(
-                value: "blacklist",
-                child: Text(
-                    blacklisted
-                        ? "Remove app from blacklist"
-                        : "Blacklist app",
-                    style: TextStyle(
-                        fontSize: 12.0, color: Colors.grey[200]))),
-            PopupMenuItem<String>(
-                value: "pin",
-                child: Text(pinned ? "Remove pin from app" : "Pin app",
-                    style: TextStyle(
-                        fontSize: 12.0, color: Colors.grey[200]))),
-          ],
+          itemBuilder: (_) => <PopupMenuItem<String>>[
+                PopupMenuItem<String>(
+                    value: "blacklist",
+                    child: Text(
+                        blacklisted
+                            ? "Remove app from blacklist"
+                            : "Blacklist app",
+                        style: TextStyle(
+                            fontSize: 12.0, color: Colors.grey[200]))),
+                PopupMenuItem<String>(
+                    value: "pin",
+                    child: Text(pinned ? "Remove pin from app" : "Pin app",
+                        style: TextStyle(
+                            fontSize: 12.0, color: Colors.grey[200]))),
+              ],
           child: Row(
             children: <Widget>[
-              Text('$name',
-                  style: nameTextStyle()),
+              Text('$name', style: nameTextStyle()),
               Spacer(),
               Text(totalTimeReadable,
                   style: TextStyle(fontSize: 12, color: Colors.white)),
@@ -92,9 +91,9 @@ class App {
                       Image.file(
                           Utils.cachedFileImage(cachePath, '$packageName'),
                           height: 46),
-                      Image.asset(pinned ? 'images/pin_icon.png' : '',
+                      Image.asset('images/pin_icon.png',
+                          color: pinned ? Colors.white : Colors.transparent,
                           height: 26),
-                      // Is this a bad hack?!
                     ],
                     alignment: Alignment(1.4, -1.4),
                   ))
@@ -112,12 +111,11 @@ class App {
     return TextStyle(
         fontSize: 20.0,
         color: blacklisted ? Colors.grey[600] : Colors.white,
-        decoration: TextDecoration.combine(
-            <TextDecoration>[]..addAll(decorations)));
+        decoration:
+            TextDecoration.combine(<TextDecoration>[]..addAll(decorations)));
   }
 
-  Map<String, dynamic> toJson() =>
-      {
+  Map<String, dynamic> toJson() => {
         'name': name,
         'packageName': packageName,
         'cachedIcon': cachedIcon,

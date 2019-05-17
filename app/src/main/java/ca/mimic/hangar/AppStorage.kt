@@ -3,7 +3,7 @@ package ca.mimic.hangar
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import ca.mimic.hangar.Constants.Companion.APP_PREFS
+import ca.mimic.hangar.Constants.Companion.PREF_APP_LIST
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -27,8 +27,8 @@ class AppStorage(private val context: Context) {
 
     internal val apps: MutableList<App> by lazy {
         adapter.fromJson(
-            context.getSharedPreferences(Constants.PREFS_NAME, 0).getString(
-                APP_PREFS,
+            context.getSharedPreferences(Constants.PREFS_FILE, 0).getString(
+                PREF_APP_LIST,
                 "[]"
             )!!
         ).orEmpty().toMutableList()
@@ -55,8 +55,8 @@ class AppStorage(private val context: Context) {
         calculateSortScore()
 
         val appJson = adapter.toJson(apps)
-        val editor = context.getSharedPreferences(Constants.PREFS_NAME, 0).edit()
-        editor.putString(APP_PREFS, appJson).apply()
+        val editor = context.getSharedPreferences(Constants.PREFS_FILE, 0).edit()
+        editor.putString(PREF_APP_LIST, appJson).apply()
 
         return true
     }

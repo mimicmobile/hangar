@@ -13,24 +13,20 @@ class AppData {
     cachePath = await Utils.cachePath;
     print("Refreshing app list...");
 
-    SharedPreferences sharedPreferences = await getSharedPrefs();
+    SharedPreferences sharedPreferences = await Utils.getSharedPrefs();
     await sharedPreferences.refreshCache();
 
     _getAppsFromJson(sharedPreferences.getString("apps") ?? "[]");
   }
 
   Future save() async {
-    getSharedPrefs().then((SharedPreferences sp) {
+    Utils.getSharedPrefs().then((SharedPreferences sp) {
       sp.setString("apps", _toJson(apps));
       sp.setBool("forceRefresh", true);
       print("Saved ${apps.length} apps to SharedPrefs");
 
       _sortApps(apps);
     });
-  }
-
-  Future<SharedPreferences> getSharedPrefs() async {
-    return await SharedPreferences.getInstance();
   }
 
   _getAppsFromJson(String json) {

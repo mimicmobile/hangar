@@ -8,11 +8,21 @@ class Constants {
         const val NOTIFICATION_ID = 1337
         const val NOTIFICATION_CHANNEL_ID = "hangar"
         const val EXTRA_PACKAGE_NAME = "package_name"
+        const val SWITCH_APP_PACKAGE_NAME = "ca.mimic.hangar.switch"
         const val RECEIVER_APP_LAUNCHED = "ca.mimic.hangar.APP_LAUNCHED"
         const val RECEIVER_BOOT_COMPLETED = "ACTION_SUGGEST_NOTIFICATION_MARK_READ"
-        const val PREFS_NAME: String = "FlutterSharedPreferences"
-        const val APP_PREFS: String = "flutter.apps"
-        const val FORCE_REFRESH_PREFS: String = "flutter.forceRefresh"
+        // Prefs
+        const val PREFS_FILE: String = "FlutterSharedPreferences"
+        const val PREF_APP_LIST: String = "flutter.apps"
+        const val PREF_NUM_ROWS: String = "flutter.numRows"
+        const val PREF_APPS_PER_ROW: String = "flutter.appsPerRow"
+        const val PREF_NUM_PAGES: String = "flutter.numPages"
+        const val PREF_FORCE_REFRESH: String = "flutter.forceRefresh"
+        const val PREF_CURRENT_PAGE: String = "flutter.currentPage"
+        // Defaults
+        const val DEFAULT_NUM_ROWS: Long = 2
+        const val DEFAULT_APPS_PER_ROW: Long = 7
+        const val DEFAULT_NUM_PAGES: Long = 1
 
         val IGNORED_PACKAGES: Array<String> = arrayOf(
             "android",

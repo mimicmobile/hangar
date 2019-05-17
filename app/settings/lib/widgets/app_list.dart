@@ -89,7 +89,7 @@ class _AppListWidgetState extends State<AppListWidget>
                           onTapCallback: _presenter.appTap);
                     },
                     separatorBuilder: (BuildContext context, int index) =>
-                        Divider(color: Config.lightBgColor, height: 1,)),
+                        Divider(color: Config.lightBgColor, height: 1)),
           ),
           onRefresh: _presenter.refreshApps);
     } else {

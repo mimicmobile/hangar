@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Utils {
   static String _cacheFileName(String path, String packageName) {
@@ -15,5 +16,9 @@ class Utils {
 
   static File cachedFileImage(String path, String packageName) {
     return File(_cacheFileName(path, packageName));
+  }
+
+  static Future<SharedPreferences> getSharedPrefs() async {
+    return await SharedPreferences.getInstance();
   }
 }

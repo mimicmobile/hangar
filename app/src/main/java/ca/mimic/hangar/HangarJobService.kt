@@ -6,7 +6,7 @@ import android.app.job.JobService
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.widget.Toast
-import ca.mimic.hangar.Constants.Companion.FORCE_REFRESH_PREFS
+import ca.mimic.hangar.Constants.Companion.PREF_FORCE_REFRESH
 import ca.mimic.hangar.Constants.Companion.INITIAL_JOB_ID
 import java.util.*
 import ca.mimic.hangar.Constants.Companion.JOB_ID
@@ -35,13 +35,13 @@ class HangarJobService : JobService() {
     }
 
     private fun needsRefresh(context: Context): Boolean {
-        val shouldRefresh = context.getSharedPreferences(Constants.PREFS_NAME, 0).getBoolean(
-            FORCE_REFRESH_PREFS,
+        val shouldRefresh = context.getSharedPreferences(Constants.PREFS_FILE, 0).getBoolean(
+            PREF_FORCE_REFRESH,
             false
         )
 
-        val editor = context.getSharedPreferences(Constants.PREFS_NAME, 0).edit()
-        editor.putBoolean(FORCE_REFRESH_PREFS, false).apply()
+        val editor = context.getSharedPreferences(Constants.PREFS_FILE, 0).edit()
+        editor.putBoolean(PREF_FORCE_REFRESH, false).apply()
 
         return shouldRefresh
     }

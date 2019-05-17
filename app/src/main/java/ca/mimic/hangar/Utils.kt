@@ -78,15 +78,19 @@ class Utils {
             var icon: Bitmap? = null
             var resourceFile: FileInputStream? = null
             try {
-                resourceFile = FileInputStream("${context.cacheDir}${File.separator}$packageName.png")
-                val buffer = ByteArray(1024)
-                val bytes = ByteArrayOutputStream()
-                var bytesRead = 0
-                while (bytesRead >= 0) {
-                    bytes.write(buffer, 0, bytesRead)
-                    bytesRead = resourceFile.read(buffer, 0, buffer.size)
+                if (packageName == Constants.SWITCH_APP_PACKAGE_NAME) {
+                    icon = BitmapFactory.decodeResource(context.resources, R.drawable.ic_switch_page)
+                } else {
+                    resourceFile = FileInputStream("${context.cacheDir}${File.separator}$packageName.png")
+                    val buffer = ByteArray(1024)
+                    val bytes = ByteArrayOutputStream()
+                    var bytesRead = 0
+                    while (bytesRead >= 0) {
+                        bytes.write(buffer, 0, bytesRead)
+                        bytesRead = resourceFile.read(buffer, 0, buffer.size)
+                    }
+                    icon = BitmapFactory.decodeByteArray(bytes.toByteArray(), 0, bytes.size())
                 }
-                icon = BitmapFactory.decodeByteArray(bytes.toByteArray(), 0, bytes.size())
                 if (icon == null) {
                     log("failed to decode pre-load icon for $packageName")
                 }

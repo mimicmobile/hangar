@@ -10,6 +10,9 @@ abstract class IAppListWidgetPresenter {
 }
 
 abstract class IAppearanceWidgetPresenter {
+  get appearanceData => null;
+  void init() {}
+  void prefTap(String pref, Object value) {}
 }
 
 abstract class IBehaviorWidgetPresenter {
