@@ -20,6 +20,8 @@ class App {
   bool pinned;
   bool blacklisted;
 
+  String totalTimeReadable;
+
   App(
       this.name,
       this.packageName,
@@ -46,9 +48,10 @@ class App {
         timesUpdated = json['timesUpdated'],
         sortScore = json['sortScore'],
         pinned = json['pinned'] ?? false,
-        blacklisted = json['blacklisted'] ?? false;
+        blacklisted = json['blacklisted'] ?? false,
+        totalTimeReadable = calculateTotalTimeReadable(json['totalTimeInForeground']);
 
-  get totalTimeReadable {
+  static String calculateTotalTimeReadable(int totalTimeInForeground) {
     var duration = Duration(seconds: (totalTimeInForeground / 1000).round());
     var time = duration.inHours > 0 ? "${duration.inHours}h " : "";
     return time += "${duration.inMinutes - (duration.inHours * 60)}m";
