@@ -8,7 +8,7 @@ abstract class IAppListWidgetView {
   void refreshState();
 }
 
-abstract class IAppearanceWidgetView {
+abstract class IPreferenceWidgetView {
   bool loaded;
 
   void refreshState();

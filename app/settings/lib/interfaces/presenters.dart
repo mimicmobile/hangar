@@ -9,11 +9,9 @@ abstract class IAppListWidgetPresenter {
   refreshApps() {}
 }
 
-abstract class IAppearanceWidgetPresenter {
-  get appearanceData => null;
+abstract class IPreferenceWidgetPresenter {
+  get data => null;
+  void loaded() {}
   void init() {}
   void prefTap(String pref, Object value) {}
-}
-
-abstract class IBehaviorWidgetPresenter {
 }

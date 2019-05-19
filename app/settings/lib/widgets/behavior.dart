@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:settings/config.dart';
+import 'package:settings/presenters/behavior_widget_presenter.dart';
+import 'package:settings/widgets/preference.dart';
 
-class BehaviorWidget extends StatefulWidget {
+class BehaviorWidget extends PreferenceWidget {
+  const BehaviorWidget({Key key}) : super(key: key);
+
   @override
-  State<StatefulWidget> createState() => BehaviorWidgetState();
+  State<StatefulWidget> createState() => _BehaviorWidgetState();
 }
 
-class BehaviorWidgetState extends State<BehaviorWidget> {
+class _BehaviorWidgetState extends PreferenceWidgetState {
+  @override
+  void initState() {
+    presenter = BehaviorWidgetPresenter(this);
+    presenter.init();
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(color: Config.backgroundColor);
+    return super.build(context);
   }
 }
+

@@ -11,12 +11,17 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Build
 import android.widget.RemoteViews
+import androidx.annotation.ColorRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.*
+import androidx.core.content.ContextCompat
 import ca.mimic.hangar.Constants.Companion.EXTRA_PACKAGE_NAME
 import ca.mimic.hangar.Constants.Companion.NOTIFICATION_ID
+import ca.mimic.hangar.Constants.Companion.PREF_BACKGROUND_COLOR
+import ca.mimic.hangar.Constants.Companion.PREF_BACKGROUND_COLOR_DEFAULT
 import ca.mimic.hangar.Constants.Companion.RECEIVER_APP_LAUNCHED
 import ca.mimic.hangar.Constants.Companion.SWITCH_APP_PACKAGE_NAME
+import ca.mimic.hangar.Utils.Companion.log
 import kotlin.math.ceil
 
 class NotificationShortcuts(private val context: Context) {
@@ -51,7 +56,6 @@ class NotificationShortcuts(private val context: Context) {
         // TODO: Settings - Add pinned location (end of page vs. start)
         val totalAppsToGet = appsPerPage * numOfPages
 
-        // Add rest of apps after pinned
         val sortedList = appStorage.apps.filter { !it.blacklisted }.take(totalAppsToGet)
 
         // Add apps to display on current page
@@ -91,9 +95,16 @@ class NotificationShortcuts(private val context: Context) {
     }
 
     private fun setBackgroundColor(views: List<RemoteViews>) {
+        val bgColorPref = context.getSharedPreferences(Constants.PREFS_FILE, 0)
+            .getString(PREF_BACKGROUND_COLOR, PREF_BACKGROUND_COLOR_DEFAULT)
         for (view in views) {
-            // TODO: Settings
-            view.setInt(R.id.notifContainer, "setBackgroundColor", Color.parseColor("#212121"))
+            if (bgColorPref == Constants.PREF_BACKGROUND_COLOR_DARK) {
+                view.setInt(R.id.notifContainer, "setBackgroundColor", ContextCompat.getColor(context, R.color.darkBg))
+            } else if (bgColorPref == Constants.PREF_BACKGROUND_COLOR_BLACK) {
+                view.setInt(R.id.notifContainer, "setBackgroundColor", ContextCompat.getColor(context, R.color.blackBg))
+            } else {
+                view.setInt(R.id.notifContainer, "setBackgroundColor", Color.WHITE)
+            }
         }
     }
 

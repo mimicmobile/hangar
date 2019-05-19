@@ -1,28 +1,17 @@
-import 'package:settings/interfaces/presenters.dart';
 import 'package:settings/interfaces/views.dart';
 import 'package:settings/models/appearance_data.dart';
-import 'package:settings/utils.dart';
+import 'package:settings/models/preference_data.dart';
+import 'package:settings/presenters/preference_widget_presenter.dart';
 
-class AppearanceWidgetPresenter implements IAppearanceWidgetPresenter {
-  final IAppearanceWidgetView _view;
-  AppearanceData appearanceData;
+class AppearanceWidgetPresenter extends PreferenceWidgetPresenter {
+  final IPreferenceWidgetView _view;
+  PreferenceData data;
 
-  AppearanceWidgetPresenter(this._view);
+  AppearanceWidgetPresenter(this._view) : super(_view);
 
   @override
   void init() async {
-    appearanceData = AppearanceData();
-    appearanceData.refresh().then((_) {
-      _view.loaded = true;
-      _view.refreshState();
-    });
-  }
-
-  @override
-  void prefTap(String pref, Object value) {
-    if (value is int && value != null) {
-      Utils.getSharedPrefs().then((sp) => sp.setInt(pref, value));
-    }
-    _view.refreshState();
+    data = AppearanceData();
+    super.init();
   }
 }

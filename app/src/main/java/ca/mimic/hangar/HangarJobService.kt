@@ -6,11 +6,13 @@ import android.app.job.JobService
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.widget.Toast
+import ca.mimic.hangar.Constants.Companion.DEFAULT_JOB_INTERVAL
 import ca.mimic.hangar.Constants.Companion.PREF_FORCE_REFRESH
 import ca.mimic.hangar.Constants.Companion.INITIAL_JOB_ID
 import java.util.*
 import ca.mimic.hangar.Constants.Companion.JOB_ID
-import ca.mimic.hangar.Constants.Companion.JOB_INTERVAL
+import ca.mimic.hangar.Constants.Companion.PREFS_FILE
+import ca.mimic.hangar.Constants.Companion.PREF_JOB_INTERVAL
 import ca.mimic.hangar.MainActivity.Companion.startJob
 
 class HangarJobService : JobService() {
@@ -29,18 +31,27 @@ class HangarJobService : JobService() {
         }
 
         jobFinished(jp, false)
-        startJob(this, JOB_ID, JOB_INTERVAL, this::class.java)
+        startJob(this, JOB_ID, jobIntervalFromPrefs(this), this::class.java)
 
         return true
     }
 
+    private fun jobIntervalFromPrefs(context: Context): Long {
+        return Constants.PREF_JOB_INTERVAL_MAP.getValue(
+            context.getSharedPreferences(PREFS_FILE, 0).getString(
+                PREF_JOB_INTERVAL,
+                DEFAULT_JOB_INTERVAL
+            )!!
+        )
+    }
+
     private fun needsRefresh(context: Context): Boolean {
-        val shouldRefresh = context.getSharedPreferences(Constants.PREFS_FILE, 0).getBoolean(
+        val shouldRefresh = context.getSharedPreferences(PREFS_FILE, 0).getBoolean(
             PREF_FORCE_REFRESH,
             false
         )
 
-        val editor = context.getSharedPreferences(Constants.PREFS_FILE, 0).edit()
+        val editor = context.getSharedPreferences(PREFS_FILE, 0).edit()
         editor.putBoolean(PREF_FORCE_REFRESH, false).apply()
 
         return shouldRefresh

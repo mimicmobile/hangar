@@ -12,8 +12,10 @@ class Pref<T> {
   Pref(this.key, this.title, this.description, SharedPreferences sp, this.def) {
     if (T == int) {
       value[key] = sp.getInt(key) ?? this.def;
-      print("Preference $key with type $T created");
+    } else if (T == String) {
+      value[key] = sp.getString(key) ?? this.def;
     }
+    print("Preference $key with type $T created");
   }
 
   String _replaceValue(String s) {
