@@ -22,7 +22,7 @@ class HangarJobService : JobService() {
             jobFinished(jp, false)
             return true
         } else {
-            val refreshNotifications = getUsageStats() || isInitialJob(jp) || needsRefresh(this)
+            val refreshNotifications = isInitialJob(jp) || needsRefresh(this) || getUsageStats()
             if (refreshNotifications) {
                 NotificationShortcuts(this).start()
             }

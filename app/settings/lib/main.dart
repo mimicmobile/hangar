@@ -9,8 +9,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Hangar Settings',
+      title: 'Hangar',
       theme: ThemeData(
+          brightness: Brightness.dark,
           primaryColor: Config.primaryColor,
           accentColor: Config.accentColor,
           dividerColor: Config.dividerColor,

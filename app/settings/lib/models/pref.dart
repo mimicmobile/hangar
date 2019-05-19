@@ -38,26 +38,24 @@ class RadioChoicePref<T> extends Pref<T> {
       behavior: HitTestBehavior.translucent,
       child: Padding(
           padding: const EdgeInsets.all(12),
-          child: Theme(
-              data: Theme.of(context)
-                  .copyWith(cardColor: Config.bottomNavBarColor),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  Text(_replaceValue(title),
-                      style: TextStyle(fontSize: 20, color: Colors.white)),
-                  Divider(height: 6, color: Colors.transparent),
-                  Text(_replaceValue(description),
-                      style: TextStyle(fontSize: 16, color: Colors.grey[300]))
-                ],
-              ))),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Text(_replaceValue(title),
+                  style: TextStyle(fontSize: 20, color: Colors.white)),
+              Divider(height: 6, color: Colors.transparent),
+              Text(_replaceValue(description),
+                  style: TextStyle(fontSize: 16, color: Colors.grey[400]))
+            ],
+          )),
     );
   }
 
   Widget _getRadioChild(
       context, T choice, String key, T _value, Function onTapCallback) {
     return RadioListTile(
+      activeColor: Config.accentColor,
       title: Text(choice.toString()),
       groupValue: _value,
       value: choice,

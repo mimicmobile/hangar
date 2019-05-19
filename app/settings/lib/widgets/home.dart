@@ -38,11 +38,9 @@ class _HomeState extends State<Home> implements IHomeView {
             child: Scaffold(
               appBar: AppBar(
                   backgroundColor: Config.primaryColor,
-                  title: Text('Hangar Settings')),
+                  title: Text('Hangar')),
               bottomNavigationBar: Theme(
                   data: Theme.of(context).copyWith(
-                      canvasColor: Config.bottomNavBarColor,
-                      primaryColor: Config.accentColor,
                       textTheme: Theme.of(context).textTheme.copyWith(
                           caption: TextStyle(color: Colors.grey[500]))),
                   // sets the inactive color of the `BottomNavigationBar`

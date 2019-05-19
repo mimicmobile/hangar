@@ -48,18 +48,11 @@ class NotificationShortcuts(private val context: Context) {
         //          13 * (3-1) == 26
         val startIndex: Int = appsPerPage * (currentPage - 1)
 
-        // Start sortedList by grabbing all pinned apps
-        val sortedList: MutableList<App> =
-            appStorage.apps.filter { it.pinned }.sortedByDescending { it.sortScore }.toMutableList()
-
         // TODO: Settings - Add pinned location (end of page vs. start)
-
-        // Subtract num of pinned from the rest
-        val totalAppsToGet = (appsPerPage * numOfPages) - sortedList.size
+        val totalAppsToGet = appsPerPage * numOfPages
 
         // Add rest of apps after pinned
-        sortedList.addAll(appStorage.apps.filter { !it.blacklisted && !it.pinned }.sortedByDescending { it.sortScore }
-            .take(totalAppsToGet))
+        val sortedList = appStorage.apps.filter { !it.blacklisted }.take(totalAppsToGet)
 
         // Add apps to display on current page
         var count = 0

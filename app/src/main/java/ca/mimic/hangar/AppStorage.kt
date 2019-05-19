@@ -54,7 +54,7 @@ class AppStorage(private val context: Context) {
 
         calculateSortScore()
 
-        val appJson = adapter.toJson(apps)
+        val appJson = adapter.toJson(getSortedApps())
         val editor = context.getSharedPreferences(Constants.PREFS_FILE, 0).edit()
         editor.putString(PREF_APP_LIST, appJson).apply()
 
@@ -140,6 +140,12 @@ class AppStorage(private val context: Context) {
         timesLaunchedScore: Float
     ): Float {
         return (totalTimeScore + (lastTimeUsedScore * 3) + timesUpdatedScore + (timesLaunchedScore * 1.5)).toFloat()
+    }
+
+    private fun getSortedApps(): MutableList<App> {
+        val sortedList: MutableList<App> = apps.filter { it.pinned }.sortedByDescending { it.sortScore }.toMutableList()
+        sortedList.addAll(apps.filter { !it.pinned }.sortedByDescending { it.sortScore })
+        return sortedList
     }
 
     private fun getPercentile(rank: Int, size: Int): Float {
