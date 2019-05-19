@@ -40,23 +40,41 @@ class NotificationShortcuts(private val context: Context) {
 
     init {
         addRows()
-        val maxApps = getMaxApps()
-        val startIndex: Int = maxApps * (currentPage - 1)
+        // Get max apps per-page
+        val appsPerPage = getMaxApps() - switchPagePlaceholder(numOfPages)
 
-        val sortedList: MutableList<App> = appStorage.apps.filter { it.pinned }.sortedByDescending { it.sortScore }.toMutableList()
-        val totalAppsToGet = (maxApps * numOfPages) - sortedList.size - pagePlaceholder(numOfPages)
+        // Start index for current page
+        //          i.e.  appsPerPage = 13 (we take off 1 for page switch icon), currentPage = 3
+        //          13 * (3-1) == 26
+        val startIndex: Int = appsPerPage * (currentPage - 1)
+
+        // Start sortedList by grabbing all pinned apps
+        val sortedList: MutableList<App> =
+            appStorage.apps.filter { it.pinned }.sortedByDescending { it.sortScore }.toMutableList()
+
+        // TODO: Settings - Add pinned location (end of page vs. start)
+
+        // Subtract num of pinned from the rest
+        val totalAppsToGet = (appsPerPage * numOfPages) - sortedList.size
+
+        // Add rest of apps after pinned
         sortedList.addAll(appStorage.apps.filter { !it.blacklisted && !it.pinned }.sortedByDescending { it.sortScore }
             .take(totalAppsToGet))
 
+        // Add apps to display on current page
         var count = 0
-        for (i in startIndex until (startIndex + maxApps - pagePlaceholder(numOfPages))) {
+        for (i in startIndex until (startIndex + appsPerPage)) {
             val app: App = sortedList[i]
             addApp(count, app)
             count += 1
         }
-        if (pagePlaceholder(numOfPages) > 0) {
-            addApp(count, App("Switch page", packageName=SWITCH_APP_PACKAGE_NAME))
+
+        // Add switch page icon if showing multiple pages
+        if (numOfPages > 1) {
+            addApp(count, App("Switch page", packageName = SWITCH_APP_PACKAGE_NAME))
         }
+
+        // Create root container
         createRootContainer()
     }
 
@@ -190,8 +208,8 @@ class NotificationShortcuts(private val context: Context) {
         return (numOfRows * maxAppsPerRow)
     }
 
-    private fun pagePlaceholder(numOfPages: Int): Int {
-     return if (numOfPages > 1) 1 else 0
+    private fun switchPagePlaceholder(numOfPages: Int): Int {
+        return if (numOfPages > 1) 1 else 0
     }
 
 }
