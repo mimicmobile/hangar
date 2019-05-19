@@ -12,7 +12,7 @@ Currently a WIP rebuild of the original [Hangar](https://github.com/corcoran/han
 - ~~Number of icons~~ (3.0.1)
 - ~~Number of rows~~ (3.0.1)
 - Weight preferences
-- Change background color
+- ~~Change background color~~ (3.0.2)
 ## Screenshots
 <a href="screenshots/1.jpg"><img src="screenshots/1.jpg" width="260"></a>
 <a href="screenshots/2.jpg"><img src="screenshots/2.jpg" width="260"></a>
