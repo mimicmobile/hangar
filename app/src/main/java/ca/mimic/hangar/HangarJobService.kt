@@ -67,8 +67,6 @@ class HangarJobService : JobService() {
             System.currentTimeMillis()
         ).toList()
 
-        stats = stats.sortedByDescending { it.second.totalTimeInForeground }
-
         val appStorage = AppStorage(this)
 
         stats.filter {
