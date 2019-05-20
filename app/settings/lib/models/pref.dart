@@ -35,20 +35,19 @@ class RadioChoicePref<T> extends Pref<T> {
       : super(key, title, description, sp, def);
 
   Widget rowWidget(context, {Function onTapCallback}) {
-    return GestureDetector(
+    return InkWell(
       onTap: () => _showRadioDialog(context, onTapCallback),
-      behavior: HitTestBehavior.translucent,
       child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
+          padding: const EdgeInsets.only(right: 12, left: 12, top: 17, bottom: 17),
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               Text(_replaceValue(title),
-                  style: TextStyle(fontSize: 20, color: Colors.white)),
-              Divider(height: 6, color: Colors.transparent),
+                  style: TextStyle(fontSize: 18, color: Colors.white)),
+              Spacer(),
               Text(_replaceValue(description),
-                  style: TextStyle(fontSize: 16, color: Colors.grey[400]))
+                  style: TextStyle(fontSize: 18, color: Config.accentColor))
             ],
           )),
     );

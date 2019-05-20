@@ -12,10 +12,12 @@ class MyApp extends StatelessWidget {
       title: 'Hangar',
       theme: ThemeData(
           brightness: Brightness.dark,
+          scaffoldBackgroundColor: Color(0xFF141414),
           primaryColor: Config.primaryColor,
           accentColor: Config.accentColor,
           dividerColor: Config.dividerColor,
-          backgroundColor: Config.backgroundColor),
+          cardColor: Config.darkBgColor,
+          backgroundColor: Config.darkBgColor),
       home: Home(),
     );
   }

@@ -50,7 +50,7 @@ class _AppListWidgetState extends State<AppListWidget>
   Widget build(BuildContext context) {
     return OrientationBuilder(builder: (context, orientation) {
       return Container(
-          color: Config.backgroundColor,
+          color: Config.darkBgColor,
           child: Stack(children: <Widget>[_appList(context, orientation)]));
     });
   }

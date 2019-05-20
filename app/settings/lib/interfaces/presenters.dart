@@ -1,3 +1,5 @@
+import 'package:settings/models/preference_data.dart';
+
 abstract class IHomePresenter {
   void init() {}
 }
@@ -10,7 +12,7 @@ abstract class IAppListWidgetPresenter {
 }
 
 abstract class IPreferenceWidgetPresenter {
-  get data => null;
+  PreferenceData get data => null;
   void loaded() {}
   void init() {}
   void prefTap(String pref, Object value) {}

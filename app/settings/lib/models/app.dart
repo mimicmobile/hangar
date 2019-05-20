@@ -49,7 +49,8 @@ class App {
         sortScore = json['sortScore'],
         pinned = json['pinned'] ?? false,
         blacklisted = json['blacklisted'] ?? false,
-        totalTimeReadable = calculateTotalTimeReadable(json['totalTimeInForeground']);
+        totalTimeReadable =
+            calculateTotalTimeReadable(json['totalTimeInForeground']);
 
   static String calculateTotalTimeReadable(int totalTimeInForeground) {
     var duration = Duration(seconds: (totalTimeInForeground / 1000).round());
@@ -90,15 +91,8 @@ class App {
                   padding: const EdgeInsets.only(
                       top: 2, bottom: 2, right: 6, left: 12),
                   child: Stack(
-                    children: <Widget>[
-                      Image.file(
-                          Utils.cachedFileImage(cachePath, '$packageName'),
-                          height: 46),
-                      Image.asset('images/pin_icon.png',
-                          color: pinned ? Colors.white : Colors.transparent,
-                          height: 26),
-                    ],
-                    alignment: Alignment(1.4, -1.4),
+                    children: getImageStack(cachePath, packageName, pinned),
+                    alignment: Alignment(1.7, -1.7),
                   ))
             ],
           ),
@@ -107,12 +101,21 @@ class App {
     );
   }
 
+  List<Widget> getImageStack(cachePath, packageName, pinned) {
+    var widgets = [
+      Image.file(Utils.cachedFileImage(cachePath, '$packageName'), height: 46)
+    ];
+
+    if (pinned) widgets.add(Image.asset('images/pin_icon.png', height: 22));
+    return widgets;
+  }
+
   TextStyle nameTextStyle() {
     var decorations = <TextDecoration>[];
     if (blacklisted) decorations.add(TextDecoration.lineThrough);
 
     return TextStyle(
-        fontSize: 20.0,
+        fontSize: 18.0,
         color: blacklisted ? Colors.grey[600] : Colors.white,
         decoration:
             TextDecoration.combine(<TextDecoration>[]..addAll(decorations)));

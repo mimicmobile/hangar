@@ -56,31 +56,38 @@ class NotificationShortcuts(private val context: Context) {
         // TODO: Settings - Add pinned location (end of page vs. start)
         val totalAppsToGet = appsPerPage * numOfPages
 
-        val sortedList = appStorage.apps.filter { !it.blacklisted }.take(totalAppsToGet)
+        if (isReady()) {
+            val sortedList = appStorage.apps.filter { !it.blacklisted }.take(totalAppsToGet)
+            // Add apps to display on current page
+            var count = 0
+            for (i in startIndex until (startIndex + appsPerPage)) {
+                val app: App = sortedList[i]
+                addApp(count, app)
+                count += 1
+            }
 
-        // Add apps to display on current page
-        var count = 0
-        for (i in startIndex until (startIndex + appsPerPage)) {
-            val app: App = sortedList[i]
-            addApp(count, app)
-            count += 1
+            // Add switch page icon if showing multiple pages
+            if (numOfPages > 1) {
+                addApp(count, App("Switch page", packageName = SWITCH_APP_PACKAGE_NAME))
+            }
+
+            // Create root container
+            createRootContainer()
         }
-
-        // Add switch page icon if showing multiple pages
-        if (numOfPages > 1) {
-            addApp(count, App("Switch page", packageName = SWITCH_APP_PACKAGE_NAME))
-        }
-
-        // Create root container
-        createRootContainer()
     }
 
     fun start() {
-        createNotification()
+        if (isReady())
+            createNotification()
     }
 
     fun stop() {
         destroyNotification()
+    }
+
+
+    private fun isReady(): Boolean {
+        return appStorage.apps.isNotEmpty()
     }
 
     private fun createRootContainer() {

@@ -28,23 +28,22 @@ class _HomeState extends State<Home> implements IHomeView {
   Widget build(BuildContext context) {
     _presenter.pages = [
       AppListWidget(key: _presenter.appListKey),
-      AppearanceWidget(),
-      BehaviorWidget(),
+      AppearanceWidget(key: _presenter.appearanceKey),
+      BehaviorWidget(key: _presenter.behaviorKey),
     ];
 
     return MaterialApp(
-        home: DefaultTabController(
-            length: 3,
-            child: Scaffold(
-              appBar: AppBar(
-                  backgroundColor: Config.primaryColor,
-                  title: Text('Hangar')),
-              bottomNavigationBar: Theme(
-                  data: Theme.of(context).copyWith(
-                      textTheme: Theme.of(context).textTheme.copyWith(
-                          caption: TextStyle(color: Colors.grey[500]))),
-                  // sets the inactive color of the `BottomNavigationBar`
-                  child: BottomNavigationBar(
+        home: Theme(
+            data: Theme.of(context).copyWith(
+                textTheme: Theme.of(context)
+                    .textTheme
+                    .copyWith(caption: TextStyle(color: Colors.grey[500]))),
+            // sets the inactive color of the `BottomNavigationBar`
+            child: DefaultTabController(
+                length: 3,
+                child: Scaffold(
+                  appBar: AppBar(title: Text('Hangar')),
+                  bottomNavigationBar: BottomNavigationBar(
                     onTap: onTabTapped,
                     currentIndex: _presenter.currentIndex,
                     items: [
@@ -60,14 +59,14 @@ class _HomeState extends State<Home> implements IHomeView {
                           icon: Icon(Icons.accessibility),
                           title: Text('Behavior'))
                     ],
-                  )),
-              body: Builder(builder: (BuildContext context) {
-                return PageStorage(
-                  child: _presenter.pages[_presenter.currentIndex],
-                  bucket: _presenter.bucket,
-                );
-              }),
-            )));
+                  ),
+                  body: Builder(builder: (BuildContext context) {
+                    return PageStorage(
+                      child: _presenter.pages[_presenter.currentIndex],
+                      bucket: _presenter.bucket,
+                    );
+                  }),
+                ))));
   }
 
   @override
