@@ -9,6 +9,8 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import java.util.ArrayList
 import android.content.Intent
+import ca.mimic.hangar.Constants.Companion.DEFAULT_NOTIFICATION_WEIGHT
+import ca.mimic.hangar.Constants.Companion.PREF_NOTIFICATION_WEIGHT
 import ca.mimic.hangar.Utils.Companion.log
 
 class AppStorage(private val context: Context) {
@@ -22,6 +24,15 @@ class AppStorage(private val context: Context) {
         val pm = context.packageManager
         pm.getInstalledApplications(PackageManager.GET_META_DATA)
     }
+
+    private val orderPriority: String by lazy {
+        context.getSharedPreferences(Constants.PREFS_FILE, 0).getString(
+            PREF_NOTIFICATION_WEIGHT,
+            DEFAULT_NOTIFICATION_WEIGHT
+        )
+    }
+
+    private val userWeight: Array<Float> = Constants.weightMap[orderPriority] ?: Constants.defaultWeight
 
     private var appListModified: Boolean = false
 
@@ -139,7 +150,7 @@ class AppStorage(private val context: Context) {
         timesUpdatedScore: Float,
         timesLaunchedScore: Float
     ): Float {
-        return (totalTimeScore + (lastTimeUsedScore * 3) + timesUpdatedScore + (timesLaunchedScore * 1.5)).toFloat()
+        return ((totalTimeScore * userWeight[0]) + (lastTimeUsedScore * userWeight[1]) + (timesUpdatedScore * userWeight[2]) + (timesLaunchedScore * userWeight[3]))
     }
 
     private fun getSortedApps(): MutableList<App> {

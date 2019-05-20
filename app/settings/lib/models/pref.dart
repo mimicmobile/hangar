@@ -12,12 +12,17 @@ class Pref<T> {
   Map value = {};
 
   Pref(this.key, this.title, this.description, SharedPreferences sp, this.def) {
-    if (T == int) {
-      value[key] = sp.getInt(key) ?? this.def;
-    } else if (T == String) {
-      value[key] = sp.getString(key) ?? this.def;
+    try {
+      if (T == int) {
+        value[key] = sp.getInt(key) ?? this.def;
+      } else if (T == String) {
+        value[key] = sp.getString(key) ?? this.def;
+      }
+      print("Preference $key with type $T created");
+    } catch(exception) {
+      sp.remove(key);
+      Pref(key, title, description, sp, def);
     }
-    print("Preference $key with type $T created");
   }
 
   Widget rowWidget(context, {Function onTapCallback}) {
@@ -26,7 +31,7 @@ class Pref<T> {
 }
 
 class RadioChoicePref<T> extends Pref<T> {
-  final List<T> choices;
+  final List<List<Object>> choices;
 
   RadioChoicePref(
       key, title, description, SharedPreferences sp, def, this.choices)
@@ -52,10 +57,10 @@ class RadioChoicePref<T> extends Pref<T> {
   }
 
   Widget _getRadioChild(
-      context, T choice, String key, T _value, Function onTapCallback) {
+      context, String label, T choice, String key, T _value, Function onTapCallback) {
     return RadioListTile(
       activeColor: Config.accentColor,
-      title: Text(choice.toString()),
+      title: Text(label),
       groupValue: _value,
       value: choice,
       onChanged: (v) {
@@ -74,16 +79,17 @@ class RadioChoicePref<T> extends Pref<T> {
               title: Text(sprintf(title, [value[key]])),
               children: choices
                   .map((e) => _getRadioChild(
-                      context, e, key, value[key], onTapCallback))
+                      context, e[0], e[1], key, value[key], onTapCallback))
                   .toList(),
             ));
   }
 
   String _getPlural(List<String> description, v) {
-    final String def = sprintf(description[0], [value[key]]);
+    var label = choices.singleWhere((l) => l[1] == v)[0];
+    final String def = sprintf(description[0], [label]);
 
-    if (value is int && description.length > 1) {
-      return Intl.plural(v, other: def, one: sprintf(description[1], [value[key]]));
+    if (v is int && description.length > 1) {
+      return Intl.plural(v, other: def, one: sprintf(description[1], [label]));
     }
     return def;
   }

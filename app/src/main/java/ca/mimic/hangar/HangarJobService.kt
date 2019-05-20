@@ -24,7 +24,8 @@ class HangarJobService : JobService() {
             jobFinished(jp, false)
             return true
         } else {
-            val refreshNotifications = isInitialJob(jp) || needsRefresh(this) || getUsageStats()
+            val refreshNotifications =
+                isInitialJob(jp) || needsRefresh(this) || (Utils.isScreenOn(this) && getUsageStats())
             if (refreshNotifications) {
                 NotificationShortcuts(this).start()
             }
@@ -37,11 +38,9 @@ class HangarJobService : JobService() {
     }
 
     private fun jobIntervalFromPrefs(context: Context): Long {
-        return Constants.PREF_JOB_INTERVAL_MAP.getValue(
-            context.getSharedPreferences(PREFS_FILE, 0).getString(
-                PREF_JOB_INTERVAL,
-                DEFAULT_JOB_INTERVAL
-            )!!
+        return context.getSharedPreferences(PREFS_FILE, 0).getLong(
+            PREF_JOB_INTERVAL,
+            DEFAULT_JOB_INTERVAL
         )
     }
 
@@ -62,7 +61,7 @@ class HangarJobService : JobService() {
     }
 
     private fun getUsageStats(): Boolean {
-        var stats = getUsageStatsManager().queryAndAggregateUsageStats(
+        val stats = getUsageStatsManager().queryAndAggregateUsageStats(
             getBeginTimeMillis(),
             System.currentTimeMillis()
         ).toList()

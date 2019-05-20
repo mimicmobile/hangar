@@ -11,7 +11,6 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Build
 import android.widget.RemoteViews
-import androidx.annotation.ColorRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.*
 import androidx.core.content.ContextCompat
@@ -21,7 +20,6 @@ import ca.mimic.hangar.Constants.Companion.PREF_BACKGROUND_COLOR
 import ca.mimic.hangar.Constants.Companion.PREF_BACKGROUND_COLOR_DEFAULT
 import ca.mimic.hangar.Constants.Companion.RECEIVER_APP_LAUNCHED
 import ca.mimic.hangar.Constants.Companion.SWITCH_APP_PACKAGE_NAME
-import ca.mimic.hangar.Utils.Companion.log
 import kotlin.math.ceil
 
 class NotificationShortcuts(private val context: Context) {

@@ -12,9 +12,11 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.hardware.display.DisplayManager
 import android.os.Process
 import android.util.Log
 import android.util.TypedValue
+import android.view.Display
 import androidx.core.app.AppOpsManagerCompat.MODE_ALLOWED
 import java.io.*
 import java.util.*
@@ -133,6 +135,16 @@ class Utils {
 
         fun getRandomNumber(limit: Int): Int {
             return Random().nextInt(limit) + 1
+        }
+
+        fun isScreenOn(context: Context): Boolean {
+            val dm = context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+            for (display in dm.displays) {
+                if (display.state != Display.STATE_OFF) {
+                    return true
+                }
+            }
+            return false
         }
 
     }
