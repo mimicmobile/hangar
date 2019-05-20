@@ -7,13 +7,13 @@ class AppearanceData extends PreferenceData {
     Utils.getSharedPrefs().then((sp) {
       prefSet.add(PrefSet("Notification", [
         RadioChoicePref<int>("appsPerRow", "Number of apps",
-            ["_value_ per row"], sp, 7, [6, 7, 8]),
+            ["%s per row"], sp, 7, [6, 7, 8]),
         RadioChoicePref<int>("numRows", "Number of rows",
-            ["_value_ rows", "_value_ row"], sp, 2, [1, 2, 3]),
+            ["%s rows", "%s row"], sp, 2, [1, 2, 3]),
         RadioChoicePref<int>("numPages", "Number of pages",
-            ["_value_ pages", "_value_ page"], sp, 1, [1, 2, 3]),
+            ["%s pages", "%s page"], sp, 1, [1, 2, 3]),
         RadioChoicePref<String>("backgroundColor", "Background color",
-            ["_value_"], sp, "White", ["White", "Material Dark", "Black"])
+            ["%s"], sp, "White", ["White", "Material Dark", "Black"])
       ]));
     });
   }

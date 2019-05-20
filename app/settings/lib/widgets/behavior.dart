@@ -9,13 +9,13 @@ class BehaviorWidget extends PreferenceWidget {
   State<StatefulWidget> createState() => _BehaviorWidgetState();
 }
 
-class _BehaviorWidgetState extends PreferenceWidgetState {
+class _BehaviorWidgetState extends PreferenceWidgetState<BehaviorWidget> {
   @override
   void initState() {
+    super.initState();
+
     presenter = BehaviorWidgetPresenter(this);
     presenter.init();
-
-    super.initState();
   }
 
   @override

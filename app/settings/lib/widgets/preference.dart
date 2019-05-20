@@ -11,8 +11,7 @@ class PreferenceWidget extends StatefulWidget {
   State<StatefulWidget> createState() => PreferenceWidgetState();
 }
 
-class PreferenceWidgetState extends State<PreferenceWidget>
-    implements IPreferenceWidgetView {
+class PreferenceWidgetState<T extends PreferenceWidget> extends State<T> with AutomaticKeepAliveClientMixin<T> implements IPreferenceWidgetView {
   IPreferenceWidgetPresenter presenter;
   bool loaded = false;
 
@@ -28,6 +27,8 @@ class PreferenceWidgetState extends State<PreferenceWidget>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return OrientationBuilder(builder: (context, orientation) {
       return Container(child: _cardHolder(context, orientation));
     });
@@ -71,4 +72,7 @@ class PreferenceWidgetState extends State<PreferenceWidget>
     }
     return widgets;
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

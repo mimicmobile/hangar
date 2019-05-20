@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:settings/config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sprintf/sprintf.dart';
 
 class Pref<T> {
   final String key;
@@ -17,10 +18,6 @@ class Pref<T> {
       value[key] = sp.getString(key) ?? this.def;
     }
     print("Preference $key with type $T created");
-  }
-
-  String _replaceValue(String s) {
-    return s.replaceAll("_value_", value[key].toString());
   }
 
   Widget rowWidget(context, {Function onTapCallback}) {
@@ -44,7 +41,7 @@ class RadioChoicePref<T> extends Pref<T> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
-              Text(_replaceValue(title),
+              Text(sprintf(title, [value[key]]),
                   style: TextStyle(fontSize: 18, color: Colors.white)),
               Spacer(),
               Text(_getPlural(description, value[key]),
@@ -74,7 +71,7 @@ class RadioChoicePref<T> extends Pref<T> {
     return showDialog(
         context: context,
         builder: (context) => SimpleDialog(
-              title: Text(_replaceValue(title)),
+              title: Text(sprintf(title, [value[key]])),
               children: choices
                   .map((e) => _getRadioChild(
                       context, e, key, value[key], onTapCallback))
@@ -82,11 +79,11 @@ class RadioChoicePref<T> extends Pref<T> {
             ));
   }
 
-  String _getPlural(List<String> description, value) {
-    final String def = _replaceValue(description[0]);
+  String _getPlural(List<String> description, v) {
+    final String def = sprintf(description[0], [value[key]]);
 
     if (value is int && description.length > 1) {
-      return Intl.plural(value, other: def, one: _replaceValue(description[1]));
+      return Intl.plural(v, other: def, one: sprintf(description[1], [value[key]]));
     }
     return def;
   }

@@ -21,17 +21,17 @@ class _HomeState extends State<Home> implements IHomeView {
     _presenter = HomePresenter(this);
     _presenter.init();
 
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     _presenter.pages = [
       AppListWidget(key: _presenter.appListKey),
       AppearanceWidget(key: _presenter.appearanceKey),
       BehaviorWidget(key: _presenter.behaviorKey),
     ];
 
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp(
         home: Theme(
             data: Theme.of(context).copyWith(
@@ -42,7 +42,9 @@ class _HomeState extends State<Home> implements IHomeView {
             child: DefaultTabController(
                 length: 3,
                 child: Scaffold(
-                  appBar: AppBar(title: Text('Hangar')),
+                  appBar: AppBar(
+                      backgroundColor: Config.primaryColor,
+                      title: Text('Hangar')),
                   bottomNavigationBar: BottomNavigationBar(
                     onTap: onTabTapped,
                     currentIndex: _presenter.currentIndex,
