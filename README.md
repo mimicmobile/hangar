@@ -16,3 +16,4 @@ Currently a WIP rebuild of the original [Hangar](https://github.com/corcoran/han
 ## Screenshots
 <a href="screenshots/1.jpg"><img src="screenshots/1.jpg" width="260"></a>
 <a href="screenshots/2.jpg"><img src="screenshots/2.jpg" width="260"></a>
+<a href="screenshots/3.jpg"><img src="screenshots/3.jpg" width="260"></a>
