@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:settings/config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Pref<T> {
   final String key;
   final String title;
-  final String description;
+  final List<String> description;
   final T def;
   Map value = {};
 
@@ -46,7 +47,7 @@ class RadioChoicePref<T> extends Pref<T> {
               Text(_replaceValue(title),
                   style: TextStyle(fontSize: 18, color: Colors.white)),
               Spacer(),
-              Text(_replaceValue(description),
+              Text(_getPlural(description, value[key]),
                   style: TextStyle(fontSize: 18, color: Config.accentColor))
             ],
           )),
@@ -79,5 +80,14 @@ class RadioChoicePref<T> extends Pref<T> {
                       context, e, key, value[key], onTapCallback))
                   .toList(),
             ));
+  }
+
+  String _getPlural(List<String> description, value) {
+    final String def = _replaceValue(description[0]);
+
+    if (value is int && description.length > 1) {
+      return Intl.plural(value, other: def, one: _replaceValue(description[1]));
+    }
+    return def;
   }
 }

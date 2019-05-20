@@ -8,7 +8,7 @@ class BehaviorData extends PreferenceData {
       prefSet.add(PrefSet("Notification", [RadioChoicePref<String>(
           "jobInterval",
           "Update interval",
-          "Every _value_",
+          ["Every _value_"],
           sp,
           "20 seconds",
           ["5 seconds", "10 seconds", "15 seconds", "20 seconds", "30 seconds", "1 minute", "2 minutes"])]));
