@@ -41,7 +41,7 @@ class Constants {
         const val DEFAULT_NUM_ROWS: Long = 2
         const val DEFAULT_APPS_PER_ROW: Long = 7
         const val DEFAULT_NUM_PAGES: Long = 1
-        const val DEFAULT_JOB_INTERVAL: Long = 20000
+        const val DEFAULT_JOB_INTERVAL: Long = 15000
         const val DEFAULT_NOTIFICATION_WEIGHT: String = "lastUsed"
 
         val IGNORED_PACKAGES: Array<String> = arrayOf(

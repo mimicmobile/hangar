@@ -11,7 +11,7 @@ class BehaviorData extends PreferenceData {
             "Update interval",
             ["Every %s"],
             sp,
-            20000,
+            15000,
             [
               ["5 seconds", 5000],
               ["10 seconds", 10000],
