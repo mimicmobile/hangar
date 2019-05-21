@@ -50,8 +50,7 @@ class HangarJobService : JobService() {
             true
         )
 
-        val editor = context.getSharedPreferences(PREFS_FILE, 0).edit()
-        editor.putBoolean(PREF_FORCE_REFRESH, false).apply()
+        Utils.setForceRefresh(context, false)
 
         return shouldRefresh
     }

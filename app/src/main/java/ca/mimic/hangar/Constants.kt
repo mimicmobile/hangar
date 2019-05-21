@@ -7,6 +7,8 @@ class Constants {
         const val NOTIFICATION_ID = 1337
         const val NOTIFICATION_CHANNEL_ID = "hangar"
         const val EXTRA_PACKAGE_NAME = "package_name"
+        const val FLUTTER_CHANNEL = "hangar/native_channel"
+        const val REFRESH_NOTIFICATION_MESSAGE = "refresh_notification"
         const val SWITCH_APP_PACKAGE_NAME = "ca.mimic.hangar.switch"
         const val RECEIVER_APP_LAUNCHED = "ca.mimic.hangar.APP_LAUNCHED"
         const val RECEIVER_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED"

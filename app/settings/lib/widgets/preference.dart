@@ -14,7 +14,6 @@ class PreferenceWidget extends StatefulWidget {
 
 class PreferenceWidgetState<T extends PreferenceWidget> extends State<T> with AutomaticKeepAliveClientMixin<T> implements IPreferenceWidgetView {
   IPreferenceWidgetPresenter presenter;
-  BuildContext _buildContext;
   bool loaded = false;
 
   @override
@@ -23,12 +22,11 @@ class PreferenceWidgetState<T extends PreferenceWidget> extends State<T> with Au
   }
 
   @override
-  void refreshState(bool shouldShow) {
+  void refreshState(bool shouldRefreshNotification) {
     setState(() {});
 
-    if (shouldShow) {
-      Reusable.showSnackBar(_buildContext, 'Preference changes will show on notification refresh',
-          duration: 2000);
+    if (shouldRefreshNotification) {
+      Reusable.refreshNotification();
     }
   }
 
@@ -37,8 +35,6 @@ class PreferenceWidgetState<T extends PreferenceWidget> extends State<T> with Au
     super.build(context);
 
     return OrientationBuilder(builder: (context, orientation) {
-      _buildContext = context;
-
       return Container(child: _cardHolder(context, orientation));
     });
   }

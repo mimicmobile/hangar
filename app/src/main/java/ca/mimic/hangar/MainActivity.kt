@@ -8,26 +8,47 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
+import ca.mimic.hangar.Constants.Companion.FLUTTER_CHANNEL
 import ca.mimic.hangar.Constants.Companion.INITIAL_JOB_ID
+import ca.mimic.hangar.Constants.Companion.REFRESH_NOTIFICATION_MESSAGE
 import io.flutter.app.FlutterActivity
+import io.flutter.plugin.common.BasicMessageChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
 import io.flutter.view.FlutterMain
+import io.flutter.plugin.common.StringCodec
 
 class MainActivity : FlutterActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (Utils.checkForUsagePermission(this)) {
-            startJob(this, INITIAL_JOB_ID, 0, HangarJobService::class.java)
-        } else {
+        if (!startedInitialJob(this)) {
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         FlutterMain.startInitialization(this)
         super.onCreate(savedInstanceState)
 
+        val channel = BasicMessageChannel<String>(
+            flutterView, FLUTTER_CHANNEL, StringCodec.INSTANCE
+        )
+
+        channel.setMessageHandler { s, _ ->
+            when (s) {
+                REFRESH_NOTIFICATION_MESSAGE -> { startedInitialJob(this) }
+            }
+        }
+
         GeneratedPluginRegistrant.registerWith(this)
+    }
+
+    private fun startedInitialJob(context: Context): Boolean {
+        if (Utils.checkForUsagePermission(context)) {
+            startJob(context, INITIAL_JOB_ID, 0, HangarJobService::class.java)
+            return true
+        }
+        return false
     }
 
     companion object {

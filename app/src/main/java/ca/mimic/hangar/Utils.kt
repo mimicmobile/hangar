@@ -18,6 +18,8 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.Display
 import androidx.core.app.AppOpsManagerCompat.MODE_ALLOWED
+import ca.mimic.hangar.Constants.Companion.PREFS_FILE
+import ca.mimic.hangar.Constants.Companion.PREF_FORCE_REFRESH
 import java.io.*
 import java.util.*
 
@@ -145,6 +147,14 @@ class Utils {
                 }
             }
             return false
+        }
+
+        fun setForceRefresh(context: Context, b: Boolean): Boolean {
+            context.getSharedPreferences(PREFS_FILE, 0).edit().putBoolean(
+                    PREF_FORCE_REFRESH,
+                    b
+                ).apply()
+            return b
         }
 
     }
