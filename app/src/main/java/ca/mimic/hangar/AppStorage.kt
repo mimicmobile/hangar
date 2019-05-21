@@ -13,7 +13,7 @@ import ca.mimic.hangar.Constants.Companion.DEFAULT_NOTIFICATION_WEIGHT
 import ca.mimic.hangar.Constants.Companion.PREF_NOTIFICATION_WEIGHT
 import ca.mimic.hangar.Utils.Companion.log
 
-class AppStorage(private val context: Context) {
+class AppStorage(private val context: Context, private var appListModified: Boolean = false) {
     private var moshi: Moshi = Moshi.Builder().build()
     private val appListType = Types.newParameterizedType(
         MutableList::class.java, App::class.java
@@ -33,8 +33,6 @@ class AppStorage(private val context: Context) {
     }
 
     private val userWeight: Array<Float> = Constants.weightMap[orderPriority] ?: Constants.defaultWeight
-
-    private var appListModified: Boolean = false
 
     internal val apps: MutableList<App> by lazy {
         adapter.fromJson(

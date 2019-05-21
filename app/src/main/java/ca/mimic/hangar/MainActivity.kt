@@ -21,7 +21,7 @@ class MainActivity : FlutterActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (!startedInitialJob(this)) {
+        if (!startedInstantJob(this)) {
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
     }
@@ -34,16 +34,18 @@ class MainActivity : FlutterActivity() {
             flutterView, FLUTTER_CHANNEL, StringCodec.INSTANCE
         )
 
+        GeneratedPluginRegistrant.registerWith(this)
+
         channel.setMessageHandler { s, _ ->
             when (s) {
-                REFRESH_NOTIFICATION_MESSAGE -> { startedInitialJob(this) }
+                REFRESH_NOTIFICATION_MESSAGE -> {
+                    startedInstantJob(this)
+                }
             }
         }
-
-        GeneratedPluginRegistrant.registerWith(this)
     }
 
-    private fun startedInitialJob(context: Context): Boolean {
+    private fun startedInstantJob(context: Context): Boolean {
         if (Utils.checkForUsagePermission(context)) {
             startJob(context, INITIAL_JOB_ID, 0, HangarJobService::class.java)
             return true

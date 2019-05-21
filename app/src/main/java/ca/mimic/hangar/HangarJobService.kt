@@ -24,8 +24,16 @@ class HangarJobService : JobService() {
             jobFinished(jp, false)
             return true
         } else {
-            val refreshNotifications =
-                isInitialJob(jp) || needsRefresh(this) || (Utils.isScreenOn(this) && getUsageStats())
+            var refreshNotifications = true
+
+            if (isInstantJob(jp)) {
+                if (needsRefresh(this)) {
+                    getUsageStats(true)
+                }
+            } else {
+                refreshNotifications = getUsageStats()
+            }
+
             if (refreshNotifications) {
                 NotificationShortcuts(this).start()
             }
@@ -55,17 +63,19 @@ class HangarJobService : JobService() {
         return shouldRefresh
     }
 
-    private fun isInitialJob(jp: JobParameters?): Boolean {
+    private fun isInstantJob(jp: JobParameters?): Boolean {
         return jp?.jobId == INITIAL_JOB_ID
     }
 
-    private fun getUsageStats(): Boolean {
+    private fun getUsageStats(forceModified: Boolean = false): Boolean {
+        if (!Utils.isScreenOn(this)) return false
+
         val stats = getUsageStatsManager().queryAndAggregateUsageStats(
             getBeginTimeMillis(),
             System.currentTimeMillis()
         ).toList()
 
-        val appStorage = AppStorage(this)
+        val appStorage = AppStorage(this, forceModified)
 
         stats.filter {
             it.second.lastTimeUsed > 100000 &&

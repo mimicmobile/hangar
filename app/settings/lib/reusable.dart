@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:settings/utils.dart';
 
 class Reusable {
   static loadingProgress(orientation) {
@@ -28,8 +29,11 @@ class Reusable {
       Scaffold.of(context).showSnackBar(snackBar);
     });
   }
-  static refreshNotification() async {
-    const platform = const BasicMessageChannel('hangar/native_channel', StringCodec());
-    await platform.send('refresh_notification');
+  static refreshNotification() {
+    return Utils.getSharedPrefs().then((sp) async {
+      sp.setBool("forceRefresh", true);
+
+      BasicMessageChannel('hangar/native_channel', StringCodec()).send('refresh_notification');
+    });
   }
 }

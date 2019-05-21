@@ -22,7 +22,6 @@ class AppData {
   Future save() async {
     Utils.getSharedPrefs().then((SharedPreferences sp) {
       sp.setString("apps", _toJson(apps));
-      sp.setBool("forceRefresh", true);
       print("Saved ${apps.length} apps to SharedPrefs");
 
       _sortApps(apps);
