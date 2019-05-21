@@ -5,13 +5,13 @@ abstract class IHomeView {
 abstract class IAppListWidgetView {
   bool loaded;
 
-  void refreshState();
+  void refreshState(bool shouldShow);
 }
 
 abstract class IPreferenceWidgetView {
   bool loaded;
 
-  void refreshState();
+  void refreshState(bool shouldShow);
 }
 
 abstract class IBehaviorWidgetView {}

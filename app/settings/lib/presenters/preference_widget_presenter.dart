@@ -19,7 +19,7 @@ class PreferenceWidgetPresenter implements IPreferenceWidgetPresenter {
   @override
   void loaded() {
     _view.loaded = true;
-    _view.refreshState();
+    _view.refreshState(false);
   }
 
   @override
@@ -33,6 +33,6 @@ class PreferenceWidgetPresenter implements IPreferenceWidgetPresenter {
         }
       });
     }
-    _view.refreshState();
+    _view.refreshState(true);
   }
 }

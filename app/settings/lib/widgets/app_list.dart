@@ -17,6 +17,7 @@ class _AppListWidgetState extends State<AppListWidget>
     with WidgetsBindingObserver, AutomaticKeepAliveClientMixin<AppListWidget>
     implements IAppListWidgetView {
   IAppListWidgetPresenter _presenter;
+  BuildContext _buildContext;
   bool loaded = false;
 
   @override
@@ -43,8 +44,13 @@ class _AppListWidgetState extends State<AppListWidget>
   }
 
   @override
-  void refreshState() {
+  void refreshState(bool shouldShow) {
     setState(() {});
+
+    if (shouldShow) {
+      Reusable.showSnackBar(_buildContext, 'App changes will show on notification refresh',
+          duration: 2000);
+    }
   }
 
   @override
@@ -52,6 +58,8 @@ class _AppListWidgetState extends State<AppListWidget>
     super.build(context);
 
     return OrientationBuilder(builder: (context, orientation) {
+      _buildContext = context;
+
       return Container(
           color: Config.darkBgColor,
           child: Stack(children: <Widget>[_appList(context, orientation)]));

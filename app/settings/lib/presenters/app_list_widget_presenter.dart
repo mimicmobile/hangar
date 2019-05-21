@@ -28,7 +28,7 @@ class AppListWidgetPresenter implements IAppListWidgetPresenter {
     return appData.refresh().then((_) {
       print("Total apps: ${appData.apps.length}");
       _view.loaded = true;
-      _view.refreshState();
+      _view.refreshState(false);
     });
   }
 }

@@ -67,7 +67,7 @@ class AppData {
       var app = findByPackageName(packageName);
       app.blacklisted = !app.blacklisted;
       await save();
-      refreshState();
+      refreshState(true);
     });
   }
 
@@ -76,7 +76,7 @@ class AppData {
       var app = findByPackageName(packageName);
       app.pinned = !app.pinned;
       await save();
-      refreshState();
+      refreshState(true);
     });
   }
 }

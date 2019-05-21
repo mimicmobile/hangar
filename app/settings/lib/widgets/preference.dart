@@ -3,6 +3,7 @@ import 'package:settings/config.dart';
 import 'package:settings/interfaces/presenters.dart';
 import 'package:settings/interfaces/views.dart';
 import 'package:settings/models/preference_data.dart';
+import 'package:settings/reusable.dart';
 
 class PreferenceWidget extends StatefulWidget {
   const PreferenceWidget({Key key}) : super(key: key);
@@ -13,6 +14,7 @@ class PreferenceWidget extends StatefulWidget {
 
 class PreferenceWidgetState<T extends PreferenceWidget> extends State<T> with AutomaticKeepAliveClientMixin<T> implements IPreferenceWidgetView {
   IPreferenceWidgetPresenter presenter;
+  BuildContext _buildContext;
   bool loaded = false;
 
   @override
@@ -21,8 +23,13 @@ class PreferenceWidgetState<T extends PreferenceWidget> extends State<T> with Au
   }
 
   @override
-  void refreshState() {
+  void refreshState(bool shouldShow) {
     setState(() {});
+
+    if (shouldShow) {
+      Reusable.showSnackBar(_buildContext, 'Preference changes will show on notification refresh',
+          duration: 2000);
+    }
   }
 
   @override
@@ -30,6 +37,8 @@ class PreferenceWidgetState<T extends PreferenceWidget> extends State<T> with Au
     super.build(context);
 
     return OrientationBuilder(builder: (context, orientation) {
+      _buildContext = context;
+
       return Container(child: _cardHolder(context, orientation));
     });
   }
