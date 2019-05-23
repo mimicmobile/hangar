@@ -22,8 +22,8 @@ android {
         applicationId "ca.mimic.hangar"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 30500
-        versionName "3.0.5"
+        versionCode 30600
+        versionName "3.0.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
