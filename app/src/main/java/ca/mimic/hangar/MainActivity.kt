@@ -16,8 +16,15 @@ import io.flutter.plugin.common.BasicMessageChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
 import io.flutter.view.FlutterMain
 import io.flutter.plugin.common.StringCodec
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 class MainActivity : FlutterActivity() {
+    private val job = Job()
+    private val bgScope = CoroutineScope(Dispatchers.Default + job)
+
     override fun onResume() {
         super.onResume()
 
@@ -39,13 +46,20 @@ class MainActivity : FlutterActivity() {
         channel.setMessageHandler { s, _ ->
             when (s) {
                 REFRESH_NOTIFICATION_MESSAGE -> {
-                    if (Utils.needsRefresh(this)) {
-                        Utils.getUsageStats(this, true)
+                    bgScope.launch {
+                        if (Utils.needsRefresh(applicationContext)) {
+                            Utils.getUsageStats(applicationContext, true)
+                        }
+                        NotificationShortcuts(applicationContext).start()
                     }
-                    NotificationShortcuts(this).start()
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel()
     }
 
     private fun startedInstantJob(context: Context): Boolean {
