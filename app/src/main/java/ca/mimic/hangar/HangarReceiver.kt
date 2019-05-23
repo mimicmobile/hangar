@@ -5,11 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import ca.mimic.hangar.Constants.Companion.EXTRA_PACKAGE_NAME
-import ca.mimic.hangar.Constants.Companion.INITIAL_JOB_ID
 import ca.mimic.hangar.Constants.Companion.PREF_CURRENT_PAGE
 import ca.mimic.hangar.Constants.Companion.RECEIVER_APP_LAUNCHED
 import ca.mimic.hangar.Constants.Companion.RECEIVER_BOOT_COMPLETED
-import ca.mimic.hangar.MainActivity.Companion.startJob
 
 class HangarReceiver : BroadcastReceiver() {
     private lateinit var sharedPrefs: SharedPreferences
@@ -30,16 +28,13 @@ class HangarReceiver : BroadcastReceiver() {
                     context.sendBroadcast(Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
                 }
 
-                startInitialJob(context)
+                NotificationShortcuts(context).start()
             }
             RECEIVER_BOOT_COMPLETED -> {
-                startInitialJob(context)
+                Utils.getUsageStats(context)
+                NotificationShortcuts(context).start()
             }
         }
-    }
-
-    private fun startInitialJob(context: Context) {
-        startJob(context, INITIAL_JOB_ID, 0, HangarJobService::class.java)
     }
 
     private fun numOfPages(): Int {

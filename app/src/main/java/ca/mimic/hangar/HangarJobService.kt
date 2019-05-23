@@ -1,15 +1,12 @@
 package ca.mimic.hangar
 
-import android.annotation.SuppressLint
 import android.app.job.JobParameters
 import android.app.job.JobService
-import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.widget.Toast
 import ca.mimic.hangar.Constants.Companion.DEFAULT_JOB_INTERVAL
 import ca.mimic.hangar.Constants.Companion.PREF_FORCE_REFRESH
 import ca.mimic.hangar.Constants.Companion.INITIAL_JOB_ID
-import java.util.*
 import ca.mimic.hangar.Constants.Companion.JOB_ID
 import ca.mimic.hangar.Constants.Companion.PREFS_FILE
 import ca.mimic.hangar.Constants.Companion.PREF_JOB_INTERVAL
@@ -27,11 +24,11 @@ class HangarJobService : JobService() {
             var refreshNotifications = true
 
             if (isInstantJob(jp)) {
-                if (needsRefresh(this)) {
-                    getUsageStats(true)
+                if (Utils.needsRefresh(this)) {
+                    Utils.getUsageStats(this, true)
                 }
             } else {
-                refreshNotifications = getUsageStats()
+                refreshNotifications = Utils.getUsageStats(this)
             }
 
             if (refreshNotifications) {
@@ -52,58 +49,8 @@ class HangarJobService : JobService() {
         )
     }
 
-    private fun needsRefresh(context: Context): Boolean {
-        val shouldRefresh = context.getSharedPreferences(PREFS_FILE, 0).getBoolean(
-            PREF_FORCE_REFRESH,
-            true
-        )
-
-        Utils.setForceRefresh(context, false)
-
-        return shouldRefresh
-    }
-
     private fun isInstantJob(jp: JobParameters?): Boolean {
         return jp?.jobId == INITIAL_JOB_ID
-    }
-
-    private fun getUsageStats(forceModified: Boolean = false): Boolean {
-        if (!Utils.isScreenOn(this)) return false
-
-        val stats = getUsageStatsManager().queryAndAggregateUsageStats(
-            getBeginTimeMillis(),
-            System.currentTimeMillis()
-        ).toList()
-
-        val appStorage = AppStorage(this, forceModified)
-
-        stats.filter {
-            it.second.lastTimeUsed > 100000 &&
-                    it.second.totalTimeInForeground > 0 &&
-                    !Constants.IGNORED_PACKAGES.contains(it.second.packageName) &&
-                    !appStorage.launchers.contains(it.second.packageName)
-        }
-            .forEach { usageStats ->
-                appStorage.checkApp(
-                    usageStats.second.packageName,
-                    lastTimeUsed = usageStats.second.lastTimeUsed,
-                    totalTimeInForeground = usageStats.second.totalTimeInForeground
-                )
-            }
-
-        return appStorage.savePrefs()
-    }
-
-    @SuppressLint("WrongConstant")
-    private fun getUsageStatsManager(): UsageStatsManager {
-        return getSystemService(if (Utils.isApi22()) Context.USAGE_STATS_SERVICE else "usagestats") as UsageStatsManager
-    }
-
-    private fun getBeginTimeMillis(): Long {
-        val cal = Calendar.getInstance()
-        cal.add(Calendar.YEAR, -1)
-
-        return cal.timeInMillis
     }
 
     override fun onStopJob(jp: JobParameters?): Boolean {

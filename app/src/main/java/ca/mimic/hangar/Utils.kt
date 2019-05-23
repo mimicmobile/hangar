@@ -1,8 +1,10 @@
 package ca.mimic.hangar
 
+import android.annotation.SuppressLint
 import android.app.AppOpsManager
 import android.app.AppOpsManager.OPSTR_GET_USAGE_STATS
 import android.app.job.JobScheduler
+import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Context.JOB_SCHEDULER_SERVICE
 import android.content.Intent
@@ -26,6 +28,57 @@ import java.util.*
 class Utils {
     companion object {
         fun log(s: String) { Log.d("Hangar", s) }
+
+        fun getUsageStats(context: Context, forceModified: Boolean = false): Boolean {
+            if (!isScreenOn(context)) return false
+
+            val stats = getUsageStatsManager(context).queryAndAggregateUsageStats(
+                getBeginTimeMillis(),
+                System.currentTimeMillis()
+            ).toList()
+
+            val appStorage = AppStorage(context, forceModified)
+
+            stats.filter {
+                it.second.lastTimeUsed > 100000 &&
+                        it.second.totalTimeInForeground > 0 &&
+                        !Constants.IGNORED_PACKAGES.contains(it.second.packageName) &&
+                        !appStorage.launchers.contains(it.second.packageName)
+            }
+                .forEach { usageStats ->
+                    appStorage.checkApp(
+                        usageStats.second.packageName,
+                        lastTimeUsed = usageStats.second.lastTimeUsed,
+                        totalTimeInForeground = usageStats.second.totalTimeInForeground
+                    )
+                }
+
+            return appStorage.savePrefs()
+        }
+
+        @SuppressLint("WrongConstant")
+        private fun getUsageStatsManager(context: Context): UsageStatsManager {
+            return context.getSystemService(if (isApi22()) Context.USAGE_STATS_SERVICE else "usagestats") as UsageStatsManager
+        }
+
+        private fun getBeginTimeMillis(): Long {
+            val cal = Calendar.getInstance()
+            cal.add(Calendar.YEAR, -1)
+
+            return cal.timeInMillis
+        }
+
+        fun needsRefresh(context: Context): Boolean {
+            val shouldRefresh = context.getSharedPreferences(PREFS_FILE, 0).getBoolean(
+                PREF_FORCE_REFRESH,
+                true
+            )
+
+            setForceRefresh(context, false)
+
+            return shouldRefresh
+        }
+
 
         fun checkForUsagePermission(context: Context): Boolean {
             val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager

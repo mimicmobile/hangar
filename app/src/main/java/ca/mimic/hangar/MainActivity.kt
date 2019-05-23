@@ -39,7 +39,10 @@ class MainActivity : FlutterActivity() {
         channel.setMessageHandler { s, _ ->
             when (s) {
                 REFRESH_NOTIFICATION_MESSAGE -> {
-                    startedInstantJob(this)
+                    if (Utils.needsRefresh(this)) {
+                        Utils.getUsageStats(this, true)
+                    }
+                    NotificationShortcuts(this).start()
                 }
             }
         }
