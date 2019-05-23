@@ -49,6 +49,17 @@ class AppearanceData extends PreferenceData {
               ["White", "white"],
               ["Material Dark", "materialDark"],
               ["Black", "black"]
+            ]),
+        RadioChoicePref<String>(
+            "iconSize",
+            "Icon size",
+            ["%s"],
+            sp,
+            "medium",
+            [
+              ["Small", "small"],
+              ["Medium", "medium"],
+              ["Large", "large"]
             ])
       ]));
     });

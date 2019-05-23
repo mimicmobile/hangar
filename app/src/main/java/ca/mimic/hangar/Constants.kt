@@ -19,6 +19,7 @@ class Constants {
         const val PREF_APPS_PER_ROW: String = "flutter.appsPerRow"
         const val PREF_NUM_PAGES: String = "flutter.numPages"
         const val PREF_BACKGROUND_COLOR: String = "flutter.backgroundColor"
+        const val PREF_ICON_SIZE: String = "flutter.iconSize"
         const val PREF_NOTIFICATION_WEIGHT: String = "flutter.notificationWeight"
         const val PREF_JOB_INTERVAL: String = "flutter.jobInterval"
 
@@ -39,12 +40,19 @@ class Constants {
             "timesLaunched" to arrayOf(1f, 1f, 1f, 4f)
         )
 
+        internal val iconSizeMap: Map<String, Int> = mapOf(
+            "small" to R.layout.notification_item_small,
+            "medium" to R.layout.notification_item,
+            "large" to R.layout.notification_item_large
+        )
+
         // Defaults
         const val DEFAULT_NUM_ROWS: Long = 2
         const val DEFAULT_APPS_PER_ROW: Long = 7
         const val DEFAULT_NUM_PAGES: Long = 1
         const val DEFAULT_JOB_INTERVAL: Long = 15000
         const val DEFAULT_NOTIFICATION_WEIGHT: String = "lastUsed"
+        const val DEFAULT_ICON_SIZE = "medium"
 
         val IGNORED_PACKAGES: Array<String> = arrayOf(
             "android",

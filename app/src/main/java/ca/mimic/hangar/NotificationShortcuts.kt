@@ -14,6 +14,7 @@ import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.*
 import androidx.core.content.ContextCompat
+import ca.mimic.hangar.Constants.Companion.DEFAULT_ICON_SIZE
 import ca.mimic.hangar.Constants.Companion.EXTRA_PACKAGE_NAME
 import ca.mimic.hangar.Constants.Companion.NOTIFICATION_ID
 import ca.mimic.hangar.Constants.Companion.PREF_BACKGROUND_COLOR
@@ -36,6 +37,8 @@ class NotificationShortcuts(private val context: Context) {
         .getLong(Constants.PREF_NUM_PAGES, Constants.DEFAULT_NUM_PAGES).toInt()
     private val currentPage = context.getSharedPreferences(Constants.PREFS_FILE, 0)
         .getLong(Constants.PREF_CURRENT_PAGE, 1).toInt()
+    private val iconSize = context.getSharedPreferences(Constants.PREFS_FILE, 0)
+        .getString(Constants.PREF_ICON_SIZE, DEFAULT_ICON_SIZE)
 
     private val appStorage: AppStorage by lazy {
         AppStorage(context)
@@ -99,8 +102,16 @@ class NotificationShortcuts(private val context: Context) {
             .getString(PREF_BACKGROUND_COLOR, PREF_BACKGROUND_COLOR_DEFAULT)
         for (view in views) {
             when (bgColorPref) {
-                Constants.PREF_BACKGROUND_COLOR_DARK -> view.setInt(R.id.notifContainer, "setBackgroundColor", ContextCompat.getColor(context, R.color.darkBg))
-                Constants.PREF_BACKGROUND_COLOR_BLACK -> view.setInt(R.id.notifContainer, "setBackgroundColor", ContextCompat.getColor(context, R.color.blackBg))
+                Constants.PREF_BACKGROUND_COLOR_DARK -> view.setInt(
+                    R.id.notifContainer,
+                    "setBackgroundColor",
+                    ContextCompat.getColor(context, R.color.darkBg)
+                )
+                Constants.PREF_BACKGROUND_COLOR_BLACK -> view.setInt(
+                    R.id.notifContainer,
+                    "setBackgroundColor",
+                    ContextCompat.getColor(context, R.color.blackBg)
+                )
                 else -> view.setInt(R.id.notifContainer, "setBackgroundColor", Color.WHITE)
             }
         }
@@ -162,7 +173,7 @@ class NotificationShortcuts(private val context: Context) {
     }
 
     private fun createAppContainer(app: App): RemoteViews {
-        val appContainer = RemoteViews(context.packageName, R.layout.notification_item)
+        val appContainer = RemoteViews(context.packageName, Constants.iconSizeMap[iconSize] ?: error(""))
 
         appContainer.setContentDescription(R.id.imageButton, app.name)
 
