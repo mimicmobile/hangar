@@ -28,11 +28,11 @@ class HangarReceiver : BroadcastReceiver() {
                     context.sendBroadcast(Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
                 }
 
-                NotificationShortcuts(context).start()
+                NotificationShortcuts(context).create()
             }
             RECEIVER_BOOT_COMPLETED -> {
                 Utils.getUsageStats(context)
-                NotificationShortcuts(context).start()
+                NotificationShortcuts(context).create()
             }
         }
     }

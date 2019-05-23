@@ -51,7 +51,7 @@ class NotificationShortcuts(private val context: Context) {
         //          13 * (3-1) == 26
         val startIndex: Int = appsPerPage * (currentPage - 1)
 
-        // TODO: Settings - Add pinned location (end of page vs. start)
+        // TODO: Settings - Add pinned location (end of page vs. create)
         val totalAppsToGet = appsPerPage * numOfPages
 
         if (isReady()) {
@@ -74,15 +74,10 @@ class NotificationShortcuts(private val context: Context) {
         }
     }
 
-    fun start() {
+    fun create() {
         if (isReady())
             createNotification()
     }
-
-    fun stop() {
-        destroyNotification()
-    }
-
 
     private fun isReady(): Boolean {
         return appStorage.apps.isNotEmpty()
@@ -103,12 +98,10 @@ class NotificationShortcuts(private val context: Context) {
         val bgColorPref = context.getSharedPreferences(Constants.PREFS_FILE, 0)
             .getString(PREF_BACKGROUND_COLOR, PREF_BACKGROUND_COLOR_DEFAULT)
         for (view in views) {
-            if (bgColorPref == Constants.PREF_BACKGROUND_COLOR_DARK) {
-                view.setInt(R.id.notifContainer, "setBackgroundColor", ContextCompat.getColor(context, R.color.darkBg))
-            } else if (bgColorPref == Constants.PREF_BACKGROUND_COLOR_BLACK) {
-                view.setInt(R.id.notifContainer, "setBackgroundColor", ContextCompat.getColor(context, R.color.blackBg))
-            } else {
-                view.setInt(R.id.notifContainer, "setBackgroundColor", Color.WHITE)
+            when (bgColorPref) {
+                Constants.PREF_BACKGROUND_COLOR_DARK -> view.setInt(R.id.notifContainer, "setBackgroundColor", ContextCompat.getColor(context, R.color.darkBg))
+                Constants.PREF_BACKGROUND_COLOR_BLACK -> view.setInt(R.id.notifContainer, "setBackgroundColor", ContextCompat.getColor(context, R.color.blackBg))
+                else -> view.setInt(R.id.notifContainer, "setBackgroundColor", Color.WHITE)
             }
         }
     }
@@ -151,10 +144,6 @@ class NotificationShortcuts(private val context: Context) {
 
         val notification = builder.build()
         getNotificationManager().notify(NOTIFICATION_ID, notification)
-    }
-
-    private fun destroyNotification() {
-        getNotificationManager().cancel(NOTIFICATION_ID)
     }
 
     private fun getNotificationManager(): NotificationManager {

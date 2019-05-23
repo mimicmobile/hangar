@@ -5,7 +5,6 @@ import android.app.job.JobService
 import android.content.Context
 import android.widget.Toast
 import ca.mimic.hangar.Constants.Companion.DEFAULT_JOB_INTERVAL
-import ca.mimic.hangar.Constants.Companion.PREF_FORCE_REFRESH
 import ca.mimic.hangar.Constants.Companion.INITIAL_JOB_ID
 import ca.mimic.hangar.Constants.Companion.JOB_ID
 import ca.mimic.hangar.Constants.Companion.PREFS_FILE
@@ -32,7 +31,7 @@ class HangarJobService : JobService() {
             }
 
             if (refreshNotifications) {
-                NotificationShortcuts(this).start()
+                NotificationShortcuts(this).create()
             }
         }
 

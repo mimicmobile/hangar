@@ -1,8 +1,6 @@
 package ca.mimic.hangar
 
 import com.squareup.moshi.JsonClass
-import java.text.SimpleDateFormat
-import java.util.*
 
 @JsonClass(generateAdapter = true)
 data class App(
@@ -21,18 +19,6 @@ data class App(
     var pinned: Boolean = false,
     var blacklisted: Boolean = false
 ) {
-    fun lastTimeDate(): String {
-        return getSDF().format(Date(this.lastTimeUsed))
-    }
-
-    fun lastUpdatedDate(): String {
-        return getSDF().format(Date(this.lastUpdated))
-    }
-
-    private fun getSDF(): SimpleDateFormat {
-        return SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
-    }
-
     fun emptyName(): Boolean {
         return this.name.isNullOrEmpty() || this.name == "null"
     }

@@ -50,7 +50,7 @@ class MainActivity : FlutterActivity() {
                         if (Utils.needsRefresh(applicationContext)) {
                             Utils.getUsageStats(applicationContext, true)
                         }
-                        NotificationShortcuts(applicationContext).start()
+                        NotificationShortcuts(applicationContext).create()
                     }
                 }
             }
