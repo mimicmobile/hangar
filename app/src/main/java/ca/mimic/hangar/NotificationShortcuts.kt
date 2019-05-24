@@ -46,8 +46,6 @@ class NotificationShortcuts(private val context: Context) {
         //          i.e.  appsPerPage = 13 (we take off 1 for page switch icon), currentPage = 3
         //          13 * (3-1) == 26
         val startIndex: Int = appsPerPage * (currentPage - 1)
-
-        // TODO: Settings - Add pinned location (end of page vs. create)
         val totalAppsToGet = appsPerPage * numOfPages
 
         if (isReady()) {

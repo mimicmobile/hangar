@@ -60,6 +60,16 @@ class AppearanceData extends PreferenceData {
               ["Small", "small"],
               ["Medium", "medium"],
               ["Large", "large"]
+            ]),
+        RadioChoicePref<String>(
+            "pinnedAppPlacement",
+            "Pinned app placement",
+            ["%s"],
+            sp,
+            "left",
+            [
+              ["Left", "left"],
+              ["Right", "right"]
             ])
       ]));
     });

@@ -144,15 +144,19 @@ class AppStorage(private val context: Context, private var appListModified: Bool
     }
 
     private fun getSortedApps(): MutableList<App> {
-        val sortedList: MutableList<App> =
-            apps.filter { !it.pinned }.sortedByDescending { it.sortScore }.toMutableList()
-        val pinned =
-            apps.filter { it.pinned }.sortedByDescending { it.sortScore }
+        val sortedList = apps.filter { !it.pinned }.sortedByDescending { it.sortScore }.toMutableList()
+        val pinned = apps.filter { it.pinned }.sortedByDescending { it.sortScore }
 
-        val appsPerPage = SharedPrefsHelper.appsPerPage(SharedPrefsHelper.getPrefs(context))
-        val index = max(appsPerPage - pinned.size, 0)
+        val sharedPrefs = SharedPrefsHelper.getPrefs(context)
 
-        // if R-L: use index
+        val index = when (SharedPrefsHelper.pinnedAppPlacement(sharedPrefs)) {
+            Constants.DEFAULT_PINNED_APP_PLACEMENT -> 0  // Pin to front
+            else -> max(
+                SharedPrefsHelper.appsPerPage(sharedPrefs) - pinned.size,
+                0
+            )   // (appsPerPage - pinned) to determine index when pinned apps are R-L
+        }
+
         sortedList.addAll(index, pinned)
         return sortedList
     }

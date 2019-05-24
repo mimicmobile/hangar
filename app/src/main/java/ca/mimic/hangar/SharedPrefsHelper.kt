@@ -34,8 +34,13 @@ class SharedPrefsHelper {
         fun bgColor(sp: SharedPreferences) = sp
             .getString(Constants.PREF_BACKGROUND_COLOR, Constants.PREF_BACKGROUND_COLOR_DEFAULT)!!
 
+        fun pinnedAppPlacement(sp: SharedPreferences) = sp
+            .getString(Constants.PREF_PINNED_APP_PLACEMENT, Constants.DEFAULT_PINNED_APP_PLACEMENT)!!
+
         private fun shouldRefresh(sp: SharedPreferences) = sp
             .getBoolean(Constants.PREF_FORCE_REFRESH, true)
+
+        // Setters
 
         fun setAppList(sp: SharedPreferences, appJson: String) = sp
             .edit().putString(Constants.PREF_APP_LIST, appJson).apply()
@@ -65,6 +70,5 @@ class SharedPrefsHelper {
                 )
             )
         }
-
     }
 }

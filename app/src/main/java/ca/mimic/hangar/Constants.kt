@@ -20,6 +20,7 @@ class Constants {
         const val PREF_NUM_PAGES: String = "flutter.numPages"
         const val PREF_BACKGROUND_COLOR: String = "flutter.backgroundColor"
         const val PREF_ICON_SIZE: String = "flutter.iconSize"
+        const val PREF_PINNED_APP_PLACEMENT: String = "flutter.pinnedAppPlacement"
         const val PREF_NOTIFICATION_WEIGHT: String = "flutter.notificationWeight"
         const val PREF_JOB_INTERVAL: String = "flutter.jobInterval"
 
@@ -53,6 +54,7 @@ class Constants {
         const val DEFAULT_JOB_INTERVAL: Long = 15000
         const val DEFAULT_NOTIFICATION_WEIGHT: String = "lastUsed"
         const val DEFAULT_ICON_SIZE = "medium"
+        const val DEFAULT_PINNED_APP_PLACEMENT = "left"
 
         val IGNORED_PACKAGES: Array<String> = arrayOf(
             "android",
