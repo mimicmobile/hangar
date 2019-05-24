@@ -47,7 +47,7 @@ class MainActivity : FlutterActivity() {
             when (s) {
                 REFRESH_NOTIFICATION_MESSAGE -> {
                     bgScope.launch {
-                        if (Utils.needsRefresh(applicationContext)) {
+                        if (SharedPrefsHelper.needsRefresh(applicationContext)) {
                             Utils.getUsageStats(applicationContext, true)
                         }
                         NotificationShortcuts(applicationContext).create()

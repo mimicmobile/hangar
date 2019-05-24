@@ -3,15 +3,14 @@ package ca.mimic.hangar
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import ca.mimic.hangar.Constants.Companion.PREF_APP_LIST
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import java.util.ArrayList
 import android.content.Intent
-import ca.mimic.hangar.Constants.Companion.DEFAULT_NOTIFICATION_WEIGHT
-import ca.mimic.hangar.Constants.Companion.PREF_NOTIFICATION_WEIGHT
+import android.content.SharedPreferences
 import ca.mimic.hangar.Utils.Companion.log
+import kotlin.math.max
 
 class AppStorage(private val context: Context, private var appListModified: Boolean = false) {
     private var moshi: Moshi = Moshi.Builder().build()
@@ -25,22 +24,15 @@ class AppStorage(private val context: Context, private var appListModified: Bool
         pm.getInstalledApplications(PackageManager.GET_META_DATA)
     }
 
-    private val orderPriority: String by lazy {
-        context.getSharedPreferences(Constants.PREFS_FILE, 0).getString(
-            PREF_NOTIFICATION_WEIGHT,
-            DEFAULT_NOTIFICATION_WEIGHT
-        )
+    private val sharedPrefs: SharedPreferences by lazy {
+        SharedPrefsHelper.getPrefs(context)
     }
 
-    private val userWeight: Array<Float> = Constants.weightMap[orderPriority] ?: Constants.defaultWeight
+    private val userWeight: Array<Float> =
+        Constants.weightMap[SharedPrefsHelper.orderPriority(sharedPrefs)] ?: Constants.defaultWeight
 
     internal val apps: MutableList<App> by lazy {
-        adapter.fromJson(
-            context.getSharedPreferences(Constants.PREFS_FILE, 0).getString(
-                PREF_APP_LIST,
-                "[]"
-            )!!
-        ).orEmpty().toMutableList()
+        adapter.fromJson(SharedPrefsHelper.appList(sharedPrefs)).orEmpty().toMutableList()
     }
 
     internal val launchers: ArrayList<String> by lazy {
@@ -63,9 +55,9 @@ class AppStorage(private val context: Context, private var appListModified: Bool
 
         calculateSortScore()
 
-        val appJson = adapter.toJson(getSortedApps())
-        val editor = context.getSharedPreferences(Constants.PREFS_FILE, 0).edit()
-        editor.putString(PREF_APP_LIST, appJson).apply()
+        val sortedApps = getSortedApps()
+        val appJson = adapter.toJson(sortedApps)
+        SharedPrefsHelper.setAppList(sharedPrefs, appJson)
 
         return true
     }
@@ -152,8 +144,16 @@ class AppStorage(private val context: Context, private var appListModified: Bool
     }
 
     private fun getSortedApps(): MutableList<App> {
-        val sortedList: MutableList<App> = apps.filter { it.pinned }.sortedByDescending { it.sortScore }.toMutableList()
-        sortedList.addAll(apps.filter { !it.pinned }.sortedByDescending { it.sortScore })
+        val sortedList: MutableList<App> =
+            apps.filter { !it.pinned }.sortedByDescending { it.sortScore }.toMutableList()
+        val pinned =
+            apps.filter { it.pinned }.sortedByDescending { it.sortScore }
+
+        val appsPerPage = SharedPrefsHelper.appsPerPage(SharedPrefsHelper.getPrefs(context))
+        val index = max(appsPerPage - pinned.size, 0)
+
+        // if R-L: use index
+        sortedList.addAll(index, pinned)
         return sortedList
     }
 

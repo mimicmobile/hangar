@@ -14,11 +14,8 @@ import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.*
 import androidx.core.content.ContextCompat
-import ca.mimic.hangar.Constants.Companion.DEFAULT_ICON_SIZE
 import ca.mimic.hangar.Constants.Companion.EXTRA_PACKAGE_NAME
 import ca.mimic.hangar.Constants.Companion.NOTIFICATION_ID
-import ca.mimic.hangar.Constants.Companion.PREF_BACKGROUND_COLOR
-import ca.mimic.hangar.Constants.Companion.PREF_BACKGROUND_COLOR_DEFAULT
 import ca.mimic.hangar.Constants.Companion.RECEIVER_APP_LAUNCHED
 import ca.mimic.hangar.Constants.Companion.SWITCH_APP_PACKAGE_NAME
 import kotlin.math.ceil
@@ -29,25 +26,21 @@ class NotificationShortcuts(private val context: Context) {
 
     private val rows: MutableList<RemoteViews> = mutableListOf()
 
-    private val maxAppsPerRow = context.getSharedPreferences(Constants.PREFS_FILE, 0)
-        .getLong(Constants.PREF_APPS_PER_ROW, Constants.DEFAULT_APPS_PER_ROW).toInt()
-    private val numOfRows = context.getSharedPreferences(Constants.PREFS_FILE, 0)
-        .getLong(Constants.PREF_NUM_ROWS, Constants.DEFAULT_NUM_ROWS).toInt()
-    private val numOfPages = context.getSharedPreferences(Constants.PREFS_FILE, 0)
-        .getLong(Constants.PREF_NUM_PAGES, Constants.DEFAULT_NUM_PAGES).toInt()
-    private val currentPage = context.getSharedPreferences(Constants.PREFS_FILE, 0)
-        .getLong(Constants.PREF_CURRENT_PAGE, 1).toInt()
-    private val iconSize = context.getSharedPreferences(Constants.PREFS_FILE, 0)
-        .getString(Constants.PREF_ICON_SIZE, DEFAULT_ICON_SIZE)
-
     private val appStorage: AppStorage by lazy {
         AppStorage(context)
     }
 
+    private val sharedPrefs = SharedPrefsHelper.getPrefs(context)
+    private val maxAppsPerRow = SharedPrefsHelper.maxAppsPerRow(sharedPrefs)
+    private val numOfRows = SharedPrefsHelper.numOfRows(sharedPrefs)
+    private val numOfPages = SharedPrefsHelper.numOfPages(sharedPrefs)
+    private val currentPage = SharedPrefsHelper.currentPage(sharedPrefs)
+    private val iconSize = SharedPrefsHelper.iconSize(sharedPrefs)
+
     init {
         addRows()
         // Get max apps per-page
-        val appsPerPage = getMaxApps() - switchPagePlaceholder(numOfPages)
+        val appsPerPage = SharedPrefsHelper.appsPerPage(SharedPrefsHelper.getPrefs(context))
 
         // Start index for current page
         //          i.e.  appsPerPage = 13 (we take off 1 for page switch icon), currentPage = 3
@@ -98,8 +91,7 @@ class NotificationShortcuts(private val context: Context) {
     }
 
     private fun setBackgroundColor(views: List<RemoteViews>) {
-        val bgColorPref = context.getSharedPreferences(Constants.PREFS_FILE, 0)
-            .getString(PREF_BACKGROUND_COLOR, PREF_BACKGROUND_COLOR_DEFAULT)
+        val bgColorPref = SharedPrefsHelper.bgColor(sharedPrefs)
         for (view in views) {
             when (bgColorPref) {
                 Constants.PREF_BACKGROUND_COLOR_DARK -> view.setInt(
@@ -212,13 +204,4 @@ class NotificationShortcuts(private val context: Context) {
         val rowIndex = ceil((appIndex + 1.0) / maxAppsPerRow).toInt() - 1
         return rows.getOrNull(rowIndex)
     }
-
-    private fun getMaxApps(): Int {
-        return (numOfRows * maxAppsPerRow)
-    }
-
-    private fun switchPagePlaceholder(numOfPages: Int): Int {
-        return if (numOfPages > 1) 1 else 0
-    }
-
 }

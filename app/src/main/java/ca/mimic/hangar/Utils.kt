@@ -20,8 +20,6 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.Display
 import androidx.core.app.AppOpsManagerCompat.MODE_ALLOWED
-import ca.mimic.hangar.Constants.Companion.PREFS_FILE
-import ca.mimic.hangar.Constants.Companion.PREF_FORCE_REFRESH
 import java.io.*
 import java.util.*
 
@@ -68,17 +66,9 @@ class Utils {
             return cal.timeInMillis
         }
 
-        fun needsRefresh(context: Context): Boolean {
-            val shouldRefresh = context.getSharedPreferences(PREFS_FILE, 0).getBoolean(
-                PREF_FORCE_REFRESH,
-                true
-            )
-
-            setForceRefresh(context, false)
-
-            return shouldRefresh
+        fun switchPagePlaceholder(numOfPages: Int): Int {
+            return if (numOfPages > 1) 1 else 0
         }
-
 
         fun checkForUsagePermission(context: Context): Boolean {
             val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
@@ -201,15 +191,6 @@ class Utils {
             }
             return false
         }
-
-        fun setForceRefresh(context: Context, b: Boolean): Boolean {
-            context.getSharedPreferences(PREFS_FILE, 0).edit().putBoolean(
-                    PREF_FORCE_REFRESH,
-                    b
-                ).apply()
-            return b
-        }
-
     }
 
 
