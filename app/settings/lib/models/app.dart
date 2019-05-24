@@ -83,8 +83,15 @@ class App {
               ],
           child: Row(
             children: <Widget>[
-              Text('$name', style: nameTextStyle()),
-              Spacer(),
+              Flexible(
+                fit: FlexFit.tight,
+                child: Padding(
+                  padding: EdgeInsets.only(right: 10),
+                  child: Text('$name',
+                      style: nameTextStyle(),
+                      overflow: TextOverflow.fade),
+                ),
+              ),
               Text(totalTimeReadable,
                   style: TextStyle(fontSize: 12, color: Colors.white)),
               Padding(
