@@ -91,19 +91,12 @@ class NotificationShortcuts(private val context: Context) {
     private fun setBackgroundColor(views: List<RemoteViews>) {
         val bgColorPref = SharedPrefsHelper.bgColor(sharedPrefs)
         for (view in views) {
-            when (bgColorPref) {
-                Constants.PREF_BACKGROUND_COLOR_DARK -> view.setInt(
-                    R.id.notifContainer,
-                    "setBackgroundColor",
-                    ContextCompat.getColor(context, R.color.darkBg)
-                )
-                Constants.PREF_BACKGROUND_COLOR_BLACK -> view.setInt(
-                    R.id.notifContainer,
-                    "setBackgroundColor",
-                    ContextCompat.getColor(context, R.color.blackBg)
-                )
-                else -> view.setInt(R.id.notifContainer, "setBackgroundColor", Color.WHITE)
+            val colorInt = when (bgColorPref) {
+                Constants.PREF_BACKGROUND_COLOR_DARK -> ContextCompat.getColor(context, R.color.darkBg)
+                Constants.PREF_BACKGROUND_COLOR_BLACK -> ContextCompat.getColor(context, R.color.blackBg)
+                else -> Color.WHITE
             }
+            view.setInt(R.id.notifContainer, "setBackgroundColor", colorInt)
         }
     }
 
