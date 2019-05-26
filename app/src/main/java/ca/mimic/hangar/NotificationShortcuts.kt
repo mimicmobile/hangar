@@ -19,6 +19,7 @@ import ca.mimic.hangar.Constants.Companion.NOTIFICATION_ID
 import ca.mimic.hangar.Constants.Companion.RECEIVER_APP_LAUNCHED
 import ca.mimic.hangar.Constants.Companion.SWITCH_APP_PACKAGE_NAME
 import kotlin.math.ceil
+import kotlin.math.min
 
 class NotificationShortcuts(private val context: Context) {
     private val root: RemoteViews = RemoteViews(context.packageName, R.layout.notification_no_dividers)
@@ -52,7 +53,7 @@ class NotificationShortcuts(private val context: Context) {
             val sortedList = appStorage.apps.filter { !it.blacklisted }.take(totalAppsToGet)
             // Add apps to display on current page
             var count = 0
-            for (i in startIndex until (startIndex + appsPerPage)) {
+            for (i in startIndex until (min(startIndex + appsPerPage, sortedList.size))) {
                 val app: App = sortedList[i]
                 addApp(count, app)
                 count += 1

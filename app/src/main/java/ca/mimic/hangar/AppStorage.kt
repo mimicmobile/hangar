@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import ca.mimic.hangar.Utils.Companion.log
 import kotlin.math.max
+import kotlin.math.min
 
 class AppStorage(private val context: Context, private var appListModified: Boolean = false) {
     private var moshi: Moshi = Moshi.Builder().build()
@@ -148,17 +149,29 @@ class AppStorage(private val context: Context, private var appListModified: Bool
         val pinned = apps.filter { it.pinned }.sortedByDescending { it.sortScore }
 
         val sharedPrefs = SharedPrefsHelper.getPrefs(context)
+        val fullPageCount = SharedPrefsHelper.appsPerPage(sharedPrefs) - pinned.size
 
         val index = when (SharedPrefsHelper.pinnedAppPlacement(sharedPrefs)) {
             Constants.DEFAULT_PINNED_APP_PLACEMENT -> 0  // Pin to front
-            else -> max(
-                SharedPrefsHelper.appsPerPage(sharedPrefs) - pinned.size,
-                0
-            )   // (appsPerPage - pinned) to determine index when pinned apps are R-L
+            else -> getIndex(sortedList, fullPageCount)
         }
 
         sortedList.addAll(index, pinned)
         return sortedList
+    }
+
+    private fun getIndex(sortedList: MutableList<App>, fullPageCount: Int): Int {
+        var indexCount = 0
+        var pageCount = 0
+
+        while (pageCount < min(sortedList.size - 2, fullPageCount)) {
+            val app = sortedList[indexCount]
+            indexCount += 1
+            if (!app.blacklisted) {
+                pageCount += 1
+            }
+        }
+        return indexCount
     }
 
     private fun getPercentile(rank: Int, size: Int): Float {
