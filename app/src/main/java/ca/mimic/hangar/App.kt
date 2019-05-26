@@ -17,7 +17,9 @@ data class App(
     var timesUpdated: Long = 0L,
     var sortScore: Float = 0f,
     var pinned: Boolean = false,
-    var blacklisted: Boolean = false
+    var blacklisted: Boolean = false,
+    var customIcon: Boolean = false,
+    var cachedFile: String? = null
 ) {
     fun emptyName(): Boolean {
         return this.name.isNullOrEmpty() || this.name == "null"

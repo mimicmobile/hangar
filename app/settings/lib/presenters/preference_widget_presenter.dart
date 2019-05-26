@@ -1,6 +1,7 @@
 import 'package:settings/interfaces/presenters.dart';
 import 'package:settings/interfaces/views.dart';
 import 'package:settings/models/preference_data.dart';
+import 'package:settings/reusable.dart';
 import 'package:settings/utils.dart';
 
 class PreferenceWidgetPresenter implements IPreferenceWidgetPresenter {
@@ -25,14 +26,21 @@ class PreferenceWidgetPresenter implements IPreferenceWidgetPresenter {
   @override
   void prefTap(String pref, Object value) {
     if (value != null) {
-      Utils.getSharedPrefs().then((sp) {
+      Utils.getSharedPrefs().then((sp) async {
         if (value is int) {
           sp.setInt(pref, value);
         } else if (value is String) {
           sp.setString(pref, value);
         }
+        await prefAction(pref);
       });
     }
     _view.refreshState(true);
+  }
+
+  Future<Null> prefAction(String pref) async {
+    if (pref == "iconPack") {
+      await Reusable.iconPackRebuild();
+    }
   }
 }

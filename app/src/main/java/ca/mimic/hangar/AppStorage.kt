@@ -9,8 +9,8 @@ import com.squareup.moshi.Types
 import java.util.ArrayList
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import ca.mimic.hangar.Utils.Companion.log
-import kotlin.math.max
 import kotlin.math.min
 
 class AppStorage(private val context: Context, private var appListModified: Boolean = false) {
@@ -23,6 +23,10 @@ class AppStorage(private val context: Context, private var appListModified: Bool
     private val packages: List<ApplicationInfo> by lazy {
         val pm = context.packageManager
         pm.getInstalledApplications(PackageManager.GET_META_DATA)
+    }
+
+    private val iconsHandler by lazy {
+        IconsHandler(context)
     }
 
     private val sharedPrefs: SharedPreferences by lazy {
@@ -78,12 +82,28 @@ class AppStorage(private val context: Context, private var appListModified: Bool
 
         if (!installedApp.emptyName()) {
             log("new app: $installedApp")
+            generateIcon(context, packageName, installedApp)
 
-            installedApp.cachedIcon = Utils.saveIcon(context, packageName)
             apps.add(installedApp)
         }
 
         return installedApp
+    }
+
+    private fun generateIcon(context: Context, packageName: String, app: App) {
+        val component = Utils.getLaunchIntent(context, packageName)?.component
+        if (component != null) {
+            val filename = "${packageName}_${System.currentTimeMillis()}"
+            val bitmapData = iconsHandler.getBitmapForPackage(filename, component, android.os.Process.myUserHandle())
+            val cachedIcon = iconsHandler.cacheStoreBitmap(filename, bitmapData["bitmap"] as Bitmap?)
+            val customIcon = bitmapData["customIcon"] as Boolean?
+
+            if (customIcon != null) {
+                app.customIcon = customIcon
+            }
+            app.cachedIcon = cachedIcon
+            app.cachedFile = filename
+        }
     }
 
     fun launchApp(packageName: String) {
@@ -111,6 +131,13 @@ class AppStorage(private val context: Context, private var appListModified: Bool
             appListModified = true
 
             log("updated app: $app")
+        }
+        if (app.cachedIcon && !Utils.iconExists(context, app.cachedFile ?: packageName)) {
+            generateIcon(context, packageName, app)
+
+            appListModified = true
+
+            log("generated app icon: $app")
         }
     }
 

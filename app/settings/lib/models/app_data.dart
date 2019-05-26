@@ -29,13 +29,16 @@ class AppData {
   }
 
   _getAppsFromJson(String json) {
-    List<App> jApps = (jsonDecode(json) as List).map((e) => App.fromJson(e)).toList();
+    List<App> jApps = (jsonDecode(json) as List)
+        .map((e) => App.fromJson(e))
+        .where((e) => e.cachedIcon)
+        .toList();
     _sortApps(jApps);
   }
 
   void _sortApps(List<App> jApps) {
     jApps.sort(
-            (a, b) => b.totalTimeInForeground.compareTo(a.totalTimeInForeground));
+        (a, b) => b.totalTimeInForeground.compareTo(a.totalTimeInForeground));
 
     // Remove pinned from main list
     List<App> pinned = jApps.where((a) => a.pinned == true).toList();

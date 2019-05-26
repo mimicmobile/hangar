@@ -21,6 +21,7 @@ import android.util.TypedValue
 import android.view.Display
 import androidx.core.app.AppOpsManagerCompat.MODE_ALLOWED
 import java.io.*
+import java.lang.NullPointerException
 import java.util.*
 
 class Utils {
@@ -99,6 +100,10 @@ class Utils {
             return bitmap
         }
 
+        fun lastTimeUpdated(context: Context, packageName: String): Long {
+            return context.packageManager.getPackageInfo(packageName, 0).lastUpdateTime
+        }
+
         fun saveIcon(context: Context, packageName: String): Boolean {
             try {
                 val resourceFile: FileOutputStream
@@ -119,6 +124,10 @@ class Utils {
             } catch (ignored: PackageManager.NameNotFoundException) {
             }
             return false
+        }
+
+        fun iconExists(context: Context, filename: String): Boolean {
+            return File("${context.cacheDir}${File.separator}$filename.png").exists()
         }
 
         fun loadIcon(context: Context, packageName: String): Bitmap? {
@@ -166,6 +175,7 @@ class Utils {
                 intent.addCategory(Intent.CATEGORY_LAUNCHER)
                 intent.action = Intent.ACTION_MAIN
             } catch (e: PackageManager.NameNotFoundException) {
+            } catch (e: NullPointerException) {
             }
             return intent
         }
@@ -192,6 +202,4 @@ class Utils {
             return false
         }
     }
-
-
 }

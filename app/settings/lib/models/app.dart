@@ -19,6 +19,8 @@ class App {
   final double sortScore;
   bool pinned;
   bool blacklisted;
+  bool customIcon;
+  String cachedFile;
 
   String totalTimeReadable;
 
@@ -34,7 +36,9 @@ class App {
       this.timesUpdated,
       this.sortScore,
       this.pinned,
-      this.blacklisted);
+      this.blacklisted,
+      this.customIcon,
+      this.cachedFile);
 
   App.fromJson(Map<String, dynamic> json)
       : name = json['name'],
@@ -49,6 +53,8 @@ class App {
         sortScore = json['sortScore'],
         pinned = json['pinned'] ?? false,
         blacklisted = json['blacklisted'] ?? false,
+        customIcon = json['customIcon'] ?? false,
+        cachedFile = json['cachedFile'],
         totalTimeReadable =
             calculateTotalTimeReadable(json['totalTimeInForeground']);
 
@@ -88,8 +94,7 @@ class App {
                 child: Padding(
                   padding: EdgeInsets.only(right: 10),
                   child: Text('$name',
-                      style: nameTextStyle(),
-                      overflow: TextOverflow.fade),
+                      style: nameTextStyle(), overflow: TextOverflow.fade),
                 ),
               ),
               Text(totalTimeReadable,
@@ -110,7 +115,7 @@ class App {
 
   List<Widget> getImageStack(cachePath, packageName, pinned) {
     var widgets = [
-      Image.file(Utils.cachedFileImage(cachePath, '$packageName'), height: 46)
+      Image.file(Utils.cachedFileImage(cachePath, '$cachedFile'), height: 46)
     ];
 
     if (pinned) widgets.add(Image.asset('images/pin_icon.png', height: 22));
@@ -141,5 +146,7 @@ class App {
         'sortScore': sortScore,
         'pinned': pinned,
         'blacklisted': blacklisted,
+        'customIcon': customIcon,
+        'cachedFile': cachedFile
       };
 }

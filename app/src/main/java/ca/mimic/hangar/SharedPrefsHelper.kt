@@ -22,6 +22,9 @@ class SharedPrefsHelper {
         fun iconSize(sp: SharedPreferences): String = sp
             .getString(Constants.PREF_ICON_SIZE, Constants.DEFAULT_ICON_SIZE)!!
 
+        fun iconPack(sp: SharedPreferences): String = sp
+            .getString(Constants.PREF_ICON_PACK, Constants.DEFAULT_ICON_PACK)!!
+
         fun jobInterval(sp: SharedPreferences) = sp
             .getLong(Constants.PREF_JOB_INTERVAL, Constants.DEFAULT_JOB_INTERVAL)
 
@@ -41,6 +44,9 @@ class SharedPrefsHelper {
             .getBoolean(Constants.PREF_FORCE_REFRESH, true)
 
         // Setters
+
+        fun setIconPack(sp: SharedPreferences, iconPack: String) = sp
+            .edit().putString(Constants.PREF_ICON_PACK, iconPack).apply()
 
         fun setAppList(sp: SharedPreferences, appJson: String) = sp
             .edit().putString(Constants.PREF_APP_LIST, appJson).apply()

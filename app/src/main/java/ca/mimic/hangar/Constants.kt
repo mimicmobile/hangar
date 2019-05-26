@@ -9,6 +9,8 @@ class Constants {
         const val EXTRA_PACKAGE_NAME = "package_name"
         const val FLUTTER_CHANNEL = "hangar/native_channel"
         const val REFRESH_NOTIFICATION_MESSAGE = "refresh_notification"
+        const val ICON_PACK_REBUILD_MESSAGE = "icon_pack_rebuild"
+        const val ICON_PACK_LIST_MESSAGE = "icon_pack_list"
         const val SWITCH_APP_PACKAGE_NAME = "ca.mimic.hangar.switch"
         const val RECEIVER_APP_LAUNCHED = "ca.mimic.hangar.APP_LAUNCHED"
         const val RECEIVER_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED"
@@ -20,6 +22,7 @@ class Constants {
         const val PREF_NUM_PAGES: String = "flutter.numPages"
         const val PREF_BACKGROUND_COLOR: String = "flutter.backgroundColor"
         const val PREF_ICON_SIZE: String = "flutter.iconSize"
+        const val PREF_ICON_PACK: String = "flutter.iconPack"
         const val PREF_PINNED_APP_PLACEMENT: String = "flutter.pinnedAppPlacement"
         const val PREF_NOTIFICATION_WEIGHT: String = "flutter.notificationWeight"
         const val PREF_JOB_INTERVAL: String = "flutter.jobInterval"
@@ -54,6 +57,7 @@ class Constants {
         const val DEFAULT_JOB_INTERVAL: Long = 15000
         const val DEFAULT_NOTIFICATION_WEIGHT: String = "lastUsed"
         const val DEFAULT_ICON_SIZE = "medium"
+        const val DEFAULT_ICON_PACK = "default"
         const val DEFAULT_PINNED_APP_PLACEMENT = "left"
 
         val IGNORED_PACKAGES: Array<String> = arrayOf(

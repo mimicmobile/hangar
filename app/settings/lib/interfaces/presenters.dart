@@ -9,6 +9,7 @@ abstract class IAppListWidgetPresenter {
   void init() {}
   void appTap(String packageName, String key) {}
   refreshApps() {}
+  void handleMessage(String s) {}
 }
 
 abstract class IPreferenceWidgetPresenter {

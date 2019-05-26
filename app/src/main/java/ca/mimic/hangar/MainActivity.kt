@@ -9,6 +9,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import ca.mimic.hangar.Constants.Companion.FLUTTER_CHANNEL
+import ca.mimic.hangar.Constants.Companion.ICON_PACK_LIST_MESSAGE
+import ca.mimic.hangar.Constants.Companion.ICON_PACK_REBUILD_MESSAGE
 import ca.mimic.hangar.Constants.Companion.INITIAL_JOB_ID
 import ca.mimic.hangar.Constants.Companion.REFRESH_NOTIFICATION_MESSAGE
 import io.flutter.app.FlutterActivity
@@ -16,14 +18,12 @@ import io.flutter.plugin.common.BasicMessageChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
 import io.flutter.view.FlutterMain
 import io.flutter.plugin.common.StringCodec
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class MainActivity : FlutterActivity() {
     private val job = Job()
     private val bgScope = CoroutineScope(Dispatchers.Default + job)
+    private val iconsHandler by lazy { IconsHandler(this) }
 
     override fun onResume() {
         super.onResume()
@@ -43,7 +43,7 @@ class MainActivity : FlutterActivity() {
 
         GeneratedPluginRegistrant.registerWith(this)
 
-        channel.setMessageHandler { s, _ ->
+        channel.setMessageHandler { s, a ->
             when (s) {
                 REFRESH_NOTIFICATION_MESSAGE -> {
                     bgScope.launch {
@@ -52,6 +52,16 @@ class MainActivity : FlutterActivity() {
                         }
                         NotificationShortcuts(applicationContext).create()
                     }
+                }
+                ICON_PACK_REBUILD_MESSAGE -> {
+                    iconsHandler.cacheClear()
+                    bgScope.launch {
+                        iconsHandler.loadIconsPack()
+//                        channel.send(ICON_PACK_REBUILD_MESSAGE)
+                    }
+                }
+                ICON_PACK_LIST_MESSAGE -> {
+                    a.reply(iconsHandler.getIconPacks().joinToString(":"))
                 }
             }
         }
