@@ -2,7 +2,6 @@ package ca.mimic.hangar
 
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
@@ -34,8 +33,6 @@ import java.util.Random
  */
 
 class IconsHandler(private val context: Context) {
-    // map with available icons packs
-    private val iconsPacks = HashMap<String, String>()
     // map with available drawable for an icons pack
     private val packagesDrawables = HashMap<String, String>()
     // instance of a resource object of an icon pack
@@ -56,7 +53,6 @@ class IconsHandler(private val context: Context) {
         get() = File("${context.cacheDir}")
 
     init {
-        loadAvailableIconsPacks()
         loadIconsPack()
     }
 
@@ -143,10 +139,6 @@ class IconsHandler(private val context: Context) {
             log( "Error parsing appfilter.xml $e")
         }
 
-    }
-
-    fun getIconPacks(): List<String> {
-        return iconsPacks.keys.toList()
     }
 
     private fun loadBitmap(drawableName: String): Bitmap? {
@@ -282,27 +274,6 @@ class IconsHandler(private val context: Context) {
         }
 
         return result
-    }
-
-    /**
-     * Scan for installed icons packs
-     */
-    private fun loadAvailableIconsPacks() {
-        val launcherThemes =
-            pm.queryIntentActivities(Intent("org.adw.launcher.THEMES"), PackageManager.GET_META_DATA)
-
-        for (ri in launcherThemes) {
-            val packageName = ri.activityInfo.packageName
-            try {
-                val ai = pm.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
-                val name = pm.getApplicationLabel(ai).toString()
-                iconsPacks[packageName] = name
-                log("Added icon pack [$name]: $packageName")
-            } catch (e: NameNotFoundException) {
-                // shouldn't happen
-                log("Unable to found package $packageName$e")
-            }
-        }
     }
 
     private fun isDrawableInCache(key: String): Boolean {

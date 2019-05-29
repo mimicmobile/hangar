@@ -1,7 +1,6 @@
 import 'package:settings/interfaces/presenters.dart';
 import 'package:settings/interfaces/views.dart';
 import 'package:settings/models/preference_data.dart';
-import 'package:settings/reusable.dart';
 import 'package:settings/utils.dart';
 
 class PreferenceWidgetPresenter implements IPreferenceWidgetPresenter {
