@@ -25,7 +25,7 @@ class AppStorage(private val context: Context, private var appListModified: Bool
         pm.getInstalledApplications(PackageManager.GET_META_DATA)
     }
 
-    private val iconsHandler by lazy {
+    val iconsHandler by lazy {
         IconsHandler(context)
     }
 
@@ -41,18 +41,38 @@ class AppStorage(private val context: Context, private var appListModified: Bool
     }
 
     internal val launchers: ArrayList<String> by lazy {
-        val pm = context.packageManager
-        val queryIntent = Intent(Intent.ACTION_MAIN)
-        queryIntent.addCategory("android.intent.category.LAUNCHER_APP")
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.addCategory("android.intent.category.LAUNCHER_APP")
 
-        val pluginApps = ArrayList<String>()
-        val activityInfoList = pm.queryIntentActivities(queryIntent, 0)
+        filteredPackages(intent)
+    }
+
+    internal val themes: ArrayList<String> by lazy {
+        val intent = Intent("org.adw.launcher.THEMES")
+
+        filteredPackages(intent)
+    }
+
+    val themesJson: String by lazy {
+        val themesList = apps.filter { themes.contains(it.packageName) }.toMutableList()
+        // Add Default, copy cached icon from Hangar
+        themesList.add(0, App("Default", "default", cachedFile = getApp(context.packageName)?.cachedFile))
+        themesList.forEachIndexed { index, app ->
+            themesList[index].cachedFile = Utils.iconFromCache(context, app.cachedFile!!).absolutePath
+        }
+        adapter.toJson(themesList)
+    }
+
+    private fun filteredPackages(intent: Intent): ArrayList<String> {
+        val pm = context.packageManager
+        val filteredPackageNames = ArrayList<String>()
+        val activityInfoList = pm.queryIntentActivities(intent, 0)
         for (resolveInfo in activityInfoList) {
             if (resolveInfo.activityInfo != null) {
-                pluginApps.add(resolveInfo.activityInfo.applicationInfo.packageName)
+                filteredPackageNames.add(resolveInfo.activityInfo.applicationInfo.packageName)
             }
         }
-        pluginApps
+        return filteredPackageNames
     }
 
     fun savePrefs(): Boolean {

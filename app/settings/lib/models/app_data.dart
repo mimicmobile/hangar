@@ -28,6 +28,12 @@ class AppData {
     });
   }
 
+  List<App> getThemesFromJson(String json) {
+    return (jsonDecode(json) as List)
+        .map((e) => App.fromJson(e))
+        .toList();
+  }
+
   _getAppsFromJson(String json) {
     List<App> jApps = (jsonDecode(json) as List)
         .map((e) => App.fromJson(e))

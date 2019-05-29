@@ -15,7 +15,7 @@ class Utils {
   }
 
   static File cachedFileImage(String path, String packageName) {
-    return File(_cacheFileName(path, packageName));
+    return File(packageName != null ? _cacheFileName(path, packageName) : path);
   }
 
   static Future<SharedPreferences> getSharedPrefs() async {

@@ -54,6 +54,18 @@ class AppearanceData extends PreferenceData {
             ["Black", "black"]
           ]),
       RadioChoicePref<String>(
+          "pinnedAppPlacement",
+          "Pinned app placement",
+          ["%s"],
+          sp,
+          "left",
+          [
+            ["Left", "left"],
+            ["Right", "right"]
+          ])
+    ]));
+    prefSet.add(PrefSet("Icons", [
+      RadioChoicePref<String>(
           "iconSize",
           "Icon size",
           ["%s"],
@@ -65,17 +77,8 @@ class AppearanceData extends PreferenceData {
             ["Large", "large"]
           ]),
       RadioChoicePref<String>(
-          "pinnedAppPlacement",
-          "Pinned app placement",
-          ["%s"],
-          sp,
-          "left",
-          [
-            ["Left", "left"],
-            ["Right", "right"]
-          ]),
-      RadioChoicePref<String>(
-          "iconPack", "Icon pack", ["%s"], sp, "default", iconPackList)
+          "iconPack", "Icon pack", ["%s"], sp, "default", iconPackList,
+          previewIcon: true)
     ]));
   }
 }

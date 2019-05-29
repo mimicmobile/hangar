@@ -100,10 +100,6 @@ class Utils {
             return bitmap
         }
 
-        fun lastTimeUpdated(context: Context, packageName: String): Long {
-            return context.packageManager.getPackageInfo(packageName, 0).lastUpdateTime
-        }
-
         fun saveIcon(context: Context, packageName: String): Boolean {
             try {
                 val resourceFile: FileOutputStream
@@ -126,8 +122,12 @@ class Utils {
             return false
         }
 
+        fun iconFromCache(context: Context, filename: String): File {
+            return File("${context.cacheDir}${File.separator}$filename.png")
+        }
+
         fun iconExists(context: Context, filename: String): Boolean {
-            return File("${context.cacheDir}${File.separator}$filename.png").exists()
+            return iconFromCache(context, filename).exists()
         }
 
         fun loadIcon(context: Context, packageName: String): Bitmap? {

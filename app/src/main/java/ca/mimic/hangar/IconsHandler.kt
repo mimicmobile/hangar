@@ -67,7 +67,6 @@ class IconsHandler(private val context: Context) {
         //clear icons pack
         iconsPackPackageName = SharedPrefsHelper.iconPack(SharedPrefsHelper.getPrefs(context))
         log("Load iconPack [$iconsPackPackageName]")
-        iconPackRes = pm.getResourcesForApplication(iconsPackPackageName)
         packagesDrawables.clear()
         backImages.clear()
 
@@ -75,6 +74,8 @@ class IconsHandler(private val context: Context) {
         if (iconsPackPackageName == "default") {
             return
         }
+
+        iconPackRes = pm.getResourcesForApplication(iconsPackPackageName)
 
         var xpp: XmlPullParser? = null
 

@@ -23,7 +23,7 @@ import kotlinx.coroutines.*
 class MainActivity : FlutterActivity() {
     private val job = Job()
     private val bgScope = CoroutineScope(Dispatchers.Default + job)
-    private val iconsHandler by lazy { IconsHandler(this) }
+    private val appStorage by lazy { AppStorage(this) }
 
     override fun onResume() {
         super.onResume()
@@ -54,14 +54,14 @@ class MainActivity : FlutterActivity() {
                     }
                 }
                 ICON_PACK_REBUILD_MESSAGE -> {
-                    iconsHandler.cacheClear()
+                    appStorage.iconsHandler.cacheClear()
                     bgScope.launch {
-                        iconsHandler.loadIconsPack()
-//                        channel.send(ICON_PACK_REBUILD_MESSAGE)
+                        appStorage.iconsHandler.loadIconsPack()
+                        channel.send(ICON_PACK_REBUILD_MESSAGE)
                     }
                 }
                 ICON_PACK_LIST_MESSAGE -> {
-                    a.reply(iconsHandler.getIconPacks().joinToString(":"))
+                    a.reply(appStorage.themesJson)
                 }
             }
         }

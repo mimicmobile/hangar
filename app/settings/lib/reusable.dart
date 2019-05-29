@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:settings/models/app_data.dart';
 import 'package:settings/utils.dart';
 
 class Reusable {
@@ -38,8 +39,13 @@ class Reusable {
   }
   static Future<List<List<String>>> fetchIconPacks() async {
     var s = await BasicMessageChannel('hangar/native_channel', StringCodec()).send('icon_pack_list');
-    return s.split(":").expand((e) => [[e, e]]).toList();
+    return AppData().getThemesFromJson(s).expand(
+            (e) => [
+              [e.name, e.packageName, e.cachedFile]
+            ]
+    ).toList();
   }
+
   static Future<Null> iconPackRebuild() async {
     await BasicMessageChannel('hangar/native_channel', StringCodec()).send('icon_pack_rebuild');
   }

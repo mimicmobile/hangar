@@ -15,6 +15,7 @@ class PreferenceWidget extends StatefulWidget {
 class PreferenceWidgetState<T extends PreferenceWidget> extends State<T> with AutomaticKeepAliveClientMixin<T> implements IPreferenceWidgetView {
   IPreferenceWidgetPresenter presenter;
   bool loaded = false;
+  BuildContext _buildContext;
 
   @override
   void initState() {
@@ -32,6 +33,7 @@ class PreferenceWidgetState<T extends PreferenceWidget> extends State<T> with Au
 
   @override
   Widget build(BuildContext context) {
+    _buildContext = context;
     super.build(context);
 
     return OrientationBuilder(builder: (context, orientation) {
@@ -80,4 +82,9 @@ class PreferenceWidgetState<T extends PreferenceWidget> extends State<T> with Au
 
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void showSnackBar(String s) {
+    Reusable.showSnackBar(_buildContext, s);
+  }
 }

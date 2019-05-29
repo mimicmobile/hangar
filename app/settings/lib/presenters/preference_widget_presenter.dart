@@ -32,15 +32,15 @@ class PreferenceWidgetPresenter implements IPreferenceWidgetPresenter {
         } else if (value is String) {
           sp.setString(pref, value);
         }
-        await prefAction(pref);
+        await prefAction(pref, value);
       });
     }
     _view.refreshState(true);
   }
 
-  Future<Null> prefAction(String pref) async {
-    if (pref == "iconPack") {
-      await Reusable.iconPackRebuild();
-    }
-  }
+  @override
+  Future<Null> prefAction(String pref, Object value) async {}
+
+  @override
+  void handleMessage(String s) {}
 }
