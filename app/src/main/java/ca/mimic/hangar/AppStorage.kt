@@ -47,7 +47,7 @@ class AppStorage(private val context: Context, private var appListModified: Bool
         filteredPackages(intent)
     }
 
-    internal val themes: ArrayList<String> by lazy {
+    private val themes: ArrayList<String> by lazy {
         val intent = Intent("org.adw.launcher.THEMES")
 
         filteredPackages(intent)
@@ -56,9 +56,9 @@ class AppStorage(private val context: Context, private var appListModified: Bool
     val themesJson: String by lazy {
         val themesList = apps.filter { themes.contains(it.packageName) }.toMutableList()
         // Add Default, copy cached icon from Hangar
-        themesList.add(0, App("Default", "default", cachedFile = getApp(context.packageName)?.cachedFile))
+        themesList.add(0, App("Default", "default", cachedFile = getApp(context.packageName)?.safeCachedFile))
         themesList.forEachIndexed { index, app ->
-            themesList[index].cachedFile = Utils.iconFromCache(context, app.cachedFile!!).absolutePath
+            themesList[index].cachedFile = Utils.iconFromCache(context, app.safeCachedFile).absolutePath
         }
         adapter.toJson(themesList)
     }
@@ -152,7 +152,7 @@ class AppStorage(private val context: Context, private var appListModified: Bool
 
             log("updated app: $app")
         }
-        if (app.cachedIcon && !Utils.iconExists(context, app.cachedFile ?: packageName)) {
+        if (app.cachedIcon && !Utils.iconExists(context, app.safeCachedFile!!)) {
             generateIcon(context, packageName, app)
 
             appListModified = true

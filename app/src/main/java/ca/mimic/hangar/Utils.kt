@@ -26,7 +26,9 @@ import java.util.*
 
 class Utils {
     companion object {
-        fun log(s: String) { Log.d("Hangar", s) }
+        fun log(s: String) {
+            Log.d("Hangar", s)
+        }
 
         fun getUsageStats(context: Context, forceModified: Boolean = false): Boolean {
             if (!isScreenOn(context)) return false
@@ -39,9 +41,7 @@ class Utils {
             val appStorage = AppStorage(context, forceModified)
 
             stats.filter {
-                it.second.lastTimeUsed > 100000 &&
-                        it.second.totalTimeInForeground > 0 &&
-                        !Constants.IGNORED_PACKAGES.contains(it.second.packageName) &&
+                !Constants.IGNORED_PACKAGES.contains(it.second.packageName) &&
                         !appStorage.launchers.contains(it.second.packageName)
             }
                 .forEach { usageStats ->
@@ -122,7 +122,7 @@ class Utils {
             return false
         }
 
-        fun iconFromCache(context: Context, filename: String): File {
+        fun iconFromCache(context: Context, filename: String?): File {
             return File("${context.cacheDir}${File.separator}$filename.png")
         }
 

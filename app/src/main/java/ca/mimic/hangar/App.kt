@@ -21,6 +21,9 @@ data class App(
     var customIcon: Boolean = false,
     var cachedFile: String? = null
 ) {
+    val safeCachedFile: String?
+        get() = cachedFile ?: packageName
+
     fun emptyName(): Boolean {
         return this.name.isNullOrEmpty() || this.name == "null"
     }

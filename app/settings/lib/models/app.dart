@@ -115,7 +115,10 @@ class App {
 
   List<Widget> getImageStack(cachePath, packageName, pinned) {
     var widgets = [
-      Image.file(Utils.cachedFileImage(cachePath, '$cachedFile'), height: 46)
+      Image.file(
+          Utils.cachedFileImage(
+              cachePath, cachedFile != null ? cachedFile : packageName),
+          height: 46)
     ];
 
     if (pinned) widgets.add(Image.asset('images/pin_icon.png', height: 22));

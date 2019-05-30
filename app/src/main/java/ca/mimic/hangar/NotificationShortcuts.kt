@@ -168,7 +168,7 @@ class NotificationShortcuts(private val context: Context) {
     }
 
     private fun setIconForApp(app: App, appContainer: RemoteViews, context: Context) {
-        val iconBitmap = Utils.loadIcon(context, app.cachedFile ?: app.packageName)
+        val iconBitmap = Utils.loadIcon(context, app.safeCachedFile!!)
 
         if (iconBitmap != null) {
             val iconSize = Utils.dpToPx(context, 72)
