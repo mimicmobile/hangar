@@ -12,7 +12,9 @@ class PreferenceWidget extends StatefulWidget {
   State<StatefulWidget> createState() => PreferenceWidgetState();
 }
 
-class PreferenceWidgetState<T extends PreferenceWidget> extends State<T> with AutomaticKeepAliveClientMixin<T> implements IPreferenceWidgetView {
+class PreferenceWidgetState<T extends PreferenceWidget> extends State<T>
+    with AutomaticKeepAliveClientMixin<T>
+    implements IPreferenceWidgetView {
   IPreferenceWidgetPresenter presenter;
   bool loaded = false;
   BuildContext _buildContext;
@@ -43,7 +45,8 @@ class PreferenceWidgetState<T extends PreferenceWidget> extends State<T> with Au
 
   _cardHolder(context, orientation) {
     if (loaded) {
-      return Column(children: _cardChildren(context, orientation));
+      return ListView(
+          children: _cardChildren(context, orientation));
     } else {
       return Container();
     }
@@ -66,7 +69,7 @@ class PreferenceWidgetState<T extends PreferenceWidget> extends State<T> with Au
                         fontWeight: FontWeight.w600))),
             ListView.separated(
                 padding: EdgeInsets.only(left: 0, right: 0, bottom: 0, top: 38),
-                physics: ClampingScrollPhysics(),
+                physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: prefSet.prefs.length,
                 itemBuilder: (context, index) {

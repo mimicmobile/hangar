@@ -41,7 +41,9 @@ class Utils {
             val appStorage = AppStorage(context, forceModified)
 
             stats.filter {
-                !Constants.IGNORED_PACKAGES.contains(it.second.packageName) &&
+                it.second.lastTimeUsed > 100000 &&
+                        it.second.totalTimeInForeground > 0 &&
+                        !Constants.IGNORED_PACKAGES.contains(it.second.packageName) &&
                         !appStorage.launchers.contains(it.second.packageName)
             }
                 .forEach { usageStats ->

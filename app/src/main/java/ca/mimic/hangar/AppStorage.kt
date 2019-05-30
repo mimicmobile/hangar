@@ -53,14 +53,24 @@ class AppStorage(private val context: Context, private var appListModified: Bool
         filteredPackages(intent)
     }
 
-    val themesJson: String by lazy {
-        val themesList = apps.filter { themes.contains(it.packageName) }.toMutableList()
-        // Add Default, copy cached icon from Hangar
-        themesList.add(0, App("Default", "default", cachedFile = getApp(context.packageName)?.safeCachedFile))
-        themesList.forEachIndexed { index, app ->
-            themesList[index].cachedFile = Utils.iconFromCache(context, app.safeCachedFile).absolutePath
+    fun themesJson(): String {
+        val themesList: MutableList<App> = mutableListOf()
+        log("themesJson: listSize [${themesList.size}]")
+
+        themesList.add(
+            App(
+                "Default",
+                "default",
+                cachedFile = Utils.iconFromCache(context, getApp(context.packageName)?.safeCachedFile).absolutePath
+            )
+        )
+
+        for (packageName in themes) {
+            val app = newApp(packageName)
+            app.cachedFile = Utils.iconFromCache(context, app.safeCachedFile).absolutePath
+            themesList.add(app)
         }
-        adapter.toJson(themesList)
+        return adapter.toJson(themesList)
     }
 
     private fun filteredPackages(intent: Intent): ArrayList<String> {

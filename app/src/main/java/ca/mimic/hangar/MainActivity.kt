@@ -13,6 +13,7 @@ import ca.mimic.hangar.Constants.Companion.ICON_PACK_LIST_MESSAGE
 import ca.mimic.hangar.Constants.Companion.ICON_PACK_REBUILD_MESSAGE
 import ca.mimic.hangar.Constants.Companion.INITIAL_JOB_ID
 import ca.mimic.hangar.Constants.Companion.REFRESH_NOTIFICATION_MESSAGE
+import ca.mimic.hangar.Utils.Companion.log
 import io.flutter.app.FlutterActivity
 import io.flutter.plugin.common.BasicMessageChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
@@ -61,7 +62,9 @@ class MainActivity : FlutterActivity() {
                     }
                 }
                 ICON_PACK_LIST_MESSAGE -> {
-                    a.reply(appStorage.themesJson)
+                    val b = appStorage.themesJson()
+                    a.reply(b)
+                    log("themesJson: $b")
                 }
             }
         }

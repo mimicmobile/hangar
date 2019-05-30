@@ -35,8 +35,9 @@ class RadioChoicePref<T> extends Pref<T> {
   final List<List<Object>> choices;
   final bool previewIcon;
 
-  RadioChoicePref(key, title, description, SharedPreferences sp, def,
-      this.choices, {this.previewIcon = false})
+  RadioChoicePref(
+      key, title, description, SharedPreferences sp, def, this.choices,
+      {this.previewIcon = false})
       : super(key, title, description, sp, def);
 
   Widget rowWidget(context, {Function onTapCallback}) {
@@ -44,7 +45,7 @@ class RadioChoicePref<T> extends Pref<T> {
       onTap: () => _showRadioDialog(context, onTapCallback),
       child: Padding(
           padding:
-          const EdgeInsets.only(right: 12, left: 12, top: 17, bottom: 17),
+              const EdgeInsets.only(right: 12, left: 12, top: 17, bottom: 17),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -58,30 +59,28 @@ class RadioChoicePref<T> extends Pref<T> {
     var widgets = <Widget>[];
 
     if (this.previewIcon) {
-      var path = choices.singleWhere((l) => l[1] == value[key])[2];
+      var path = choices.singleWhere((l) => l[1] == value[key],
+          orElse: () => choices[0] as List<T>)[2];
 
       widgets.add(Padding(
         padding: EdgeInsets.only(right: 14),
-        child: Image.file(
-            Utils.cachedFileImage(path, null),
-            height: 46),
+        child: Image.file(Utils.cachedFileImage(path, null), height: 46),
       ));
     }
 
     widgets.addAll([
-        Text(sprintf(title, [value[key]]),
-            style: TextStyle(fontSize: 18, color: Colors.white)),
-        Spacer(),
-        Text(_getPlural(),
-            style: TextStyle(fontSize: 18, color: Config.accentColor))
+      Text(sprintf(title, [value[key]]),
+          style: TextStyle(fontSize: 18, color: Colors.white)),
+      Spacer(),
+      Text(_getPlural(),
+          style: TextStyle(fontSize: 18, color: Config.accentColor))
     ]);
 
     return widgets;
   }
 
   Widget _getRadioChild(context, String label, T choice, String icon,
-      String key, T _value,
-      Function onTapCallback) {
+      String key, T _value, Function onTapCallback) {
     return RadioListTile(
       activeColor: Config.accentColor,
       title: _getRadioChildTitle(label, icon),
@@ -101,9 +100,7 @@ class RadioChoicePref<T> extends Pref<T> {
     if (icon != null) {
       widgets.add(Padding(
         padding: EdgeInsets.only(right: 14),
-        child: Image.file(
-          Utils.cachedFileImage(icon, null),
-          height: 46),
+        child: Image.file(Utils.cachedFileImage(icon, null), height: 46),
       ));
     }
 
@@ -112,16 +109,14 @@ class RadioChoicePref<T> extends Pref<T> {
     return Row(children: widgets);
   }
 
-  Future<Widget> _showRadioDialog(BuildContext context,
-      Function onTapCallback) async {
+  Future<Widget> _showRadioDialog(
+      BuildContext context, Function onTapCallback) async {
     return showDialog(
         context: context,
-        builder: (context) =>
-            SimpleDialog(
+        builder: (context) => SimpleDialog(
               title: Text(sprintf(title, [value[key]])),
               children: choices
-                  .map((e) =>
-                  _getRadioChild(
+                  .map((e) => _getRadioChild(
                       context,
                       e[0],
                       e[1],
@@ -134,11 +129,12 @@ class RadioChoicePref<T> extends Pref<T> {
   }
 
   String _getPlural() {
-    var label = choices.singleWhere((l) => l[1] == value[key])[0];
+    var label = choices.singleWhere((l) => l[1] == value[key], orElse: () => choices[0] as List<T>)[0];
     final String def = sprintf(description[0], [label]);
 
     if (value[key] is int && description.length > 1) {
-      return Intl.plural(value[key], other: def, one: sprintf(description[1], [label]));
+      return Intl.plural(value[key],
+          other: def, one: sprintf(description[1], [label]));
     }
     return def;
   }
