@@ -55,7 +55,6 @@ class AppStorage(private val context: Context, private var appListModified: Bool
 
     fun themesJson(): String {
         val themesList: MutableList<App> = mutableListOf()
-        log("themesJson: listSize [${themesList.size}]")
 
         themesList.add(
             App(

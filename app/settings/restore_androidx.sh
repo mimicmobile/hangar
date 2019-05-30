@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 git checkout HEAD .android/Flutter/build.gradle
 git checkout HEAD .android/Flutter/build.gradle
 
