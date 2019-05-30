@@ -32,43 +32,31 @@ class _HomeState extends State<Home> implements IHomeView {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: Theme(
-            data: Theme.of(context).copyWith(
-                textTheme: Theme.of(context)
-                    .textTheme
-                    .copyWith(caption: TextStyle(color: Colors.grey[500]))),
-            // sets the inactive color of the `BottomNavigationBar`
-            child: DefaultTabController(
-                length: 3,
-                child: Scaffold(
-                  appBar: AppBar(
-                      backgroundColor: Config.primaryColor,
-                      title: Text('Hangar')),
-                  bottomNavigationBar: BottomNavigationBar(
-                    onTap: onTabTapped,
-                    currentIndex: _presenter.currentIndex,
-                    items: [
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.list),
-                        title: Text('Apps'),
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Icon(Icons.photo),
-                        title: Text('Appearance'),
-                      ),
-                      BottomNavigationBarItem(
-                          icon: Icon(Icons.accessibility),
-                          title: Text('Behavior'))
-                    ],
-                  ),
-                  body: Builder(builder: (BuildContext context) {
-                    return PageStorage(
-                      child: _presenter.pages[_presenter.currentIndex],
-                      bucket: _presenter.bucket,
-                    );
-                  }),
-                ))));
+    return Scaffold(
+      appBar: AppBar(title: Text('Hangar')),
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: onTabTapped,
+        currentIndex: _presenter.currentIndex,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            title: Text('Apps'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.photo),
+            title: Text('Appearance'),
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.accessibility), title: Text('Behavior'))
+        ],
+      ),
+      body: Builder(builder: (BuildContext context) {
+        return PageStorage(
+          child: _presenter.pages[_presenter.currentIndex],
+          bucket: _presenter.bucket,
+        );
+      }),
+    );
   }
 
   @override

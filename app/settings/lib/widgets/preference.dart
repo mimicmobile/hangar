@@ -45,8 +45,7 @@ class PreferenceWidgetState<T extends PreferenceWidget> extends State<T>
 
   _cardHolder(context, orientation) {
     if (loaded) {
-      return ListView(
-          children: _cardChildren(context, orientation));
+      return ListView(children: _cardChildren(context, orientation));
     } else {
       return Container();
     }

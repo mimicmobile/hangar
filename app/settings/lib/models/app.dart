@@ -67,47 +67,44 @@ class App {
   Widget rowWidget(context, cachePath, {Function onTapCallback}) {
     return Padding(
       padding: const EdgeInsets.all(8),
-      child: Theme(
-        data: Theme.of(context).copyWith(cardColor: Config.bottomNavBarColor),
-        child: PopupMenuButton(
-          offset: Offset(1, 0),
-          onSelected: (s) => onTapCallback(packageName, s),
-          itemBuilder: (_) => <PopupMenuItem<String>>[
-                PopupMenuItem<String>(
-                    value: "blacklist",
-                    child: Text(
-                        blacklisted
-                            ? "Remove app from blacklist"
-                            : "Blacklist app",
-                        style: TextStyle(
-                            fontSize: 12.0, color: Colors.grey[200]))),
-                PopupMenuItem<String>(
-                    value: "pin",
-                    child: Text(pinned ? "Remove pin from app" : "Pin app",
-                        style: TextStyle(
-                            fontSize: 12.0, color: Colors.grey[200]))),
-              ],
-          child: Row(
-            children: <Widget>[
-              Flexible(
-                fit: FlexFit.tight,
-                child: Padding(
-                  padding: EdgeInsets.only(right: 10),
-                  child: Text('$name',
-                      style: nameTextStyle(), overflow: TextOverflow.fade),
-                ),
-              ),
-              Text(totalTimeReadable,
-                  style: TextStyle(fontSize: 12, color: Colors.white)),
-              Padding(
-                  padding: const EdgeInsets.only(
-                      top: 2, bottom: 2, right: 6, left: 12),
-                  child: Stack(
-                    children: getImageStack(cachePath, packageName, pinned),
-                    alignment: Alignment(1.7, -1.7),
-                  ))
+      child: PopupMenuButton(
+        offset: Offset(1, 0),
+        onSelected: (s) => onTapCallback(packageName, s),
+        itemBuilder: (_) => <PopupMenuItem<String>>[
+              PopupMenuItem<String>(
+                  value: "blacklist",
+                  child: Text(
+                      blacklisted
+                          ? "Remove app from blacklist"
+                          : "Blacklist app",
+                      style:
+                          TextStyle(fontSize: 12.0, color: Colors.grey[200]))),
+              PopupMenuItem<String>(
+                  value: "pin",
+                  child: Text(pinned ? "Remove pin from app" : "Pin app",
+                      style:
+                          TextStyle(fontSize: 12.0, color: Colors.grey[200]))),
             ],
-          ),
+        child: Row(
+          children: <Widget>[
+            Flexible(
+              fit: FlexFit.tight,
+              child: Padding(
+                padding: EdgeInsets.only(right: 10),
+                child: Text('$name',
+                    style: nameTextStyle(), overflow: TextOverflow.fade),
+              ),
+            ),
+            Text(totalTimeReadable,
+                style: TextStyle(fontSize: 12, color: Colors.white)),
+            Padding(
+                padding: const EdgeInsets.only(
+                    top: 2, bottom: 2, right: 6, left: 12),
+                child: Stack(
+                  children: getImageStack(cachePath, packageName, pinned),
+                  alignment: Alignment(1.7, -1.7),
+                ))
+          ],
         ),
       ),
     );

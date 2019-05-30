@@ -17,7 +17,9 @@ class MyApp extends StatelessWidget {
           accentColor: Config.accentColor,
           dividerColor: Config.dividerColor,
           cardColor: Config.darkBgColor,
-          backgroundColor: Config.darkBgColor),
+          backgroundColor: Config.darkBgColor,
+          appBarTheme: AppBarTheme(color: Config.primaryColor),
+          textTheme: TextTheme(caption: TextStyle(color: Colors.grey[500]))),
       home: Home(),
     );
   }
