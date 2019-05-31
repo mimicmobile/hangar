@@ -12,7 +12,6 @@ abstract class IPreferenceWidgetView {
   bool loaded;
 
   void refreshState(bool shouldRefreshNotification);
-  void showSnackBar(String s) {}
 }
 
 abstract class IBehaviorWidgetView {}
