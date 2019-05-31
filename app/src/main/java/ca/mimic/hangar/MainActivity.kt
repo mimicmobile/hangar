@@ -57,6 +57,10 @@ class MainActivity : FlutterActivity() {
                     appStorage.iconsHandler.cacheClear()
                     bgScope.launch {
                         appStorage.iconsHandler.loadIconsPack()
+
+                        Utils.getUsageStats(applicationContext, true)
+                        NotificationShortcuts(applicationContext).create()
+
                         channel.send(ICON_PACK_REBUILD_MESSAGE)
                     }
                 }

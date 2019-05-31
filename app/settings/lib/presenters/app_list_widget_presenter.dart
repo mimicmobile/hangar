@@ -44,8 +44,7 @@ class AppListWidgetPresenter implements IAppListWidgetPresenter {
   void handleMessage(String s) {
     switch (s) {
       case "icon_pack_rebuild":
-        // Look into state destruction bug
-//        refreshApps();
+        refreshApps();
     }
   }
 }

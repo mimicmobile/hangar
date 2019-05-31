@@ -1,4 +1,3 @@
-import 'package:settings/config.dart';
 import 'package:settings/interfaces/views.dart';
 import 'package:flutter/material.dart';
 import 'package:settings/presenters/home_presenter.dart';
@@ -22,9 +21,9 @@ class _HomeState extends State<Home> implements IHomeView {
     _presenter.init();
 
     _presenter.pages = [
-      AppListWidget(key: _presenter.appListKey),
-      AppearanceWidget(key: _presenter.appearanceKey),
-      BehaviorWidget(key: _presenter.behaviorKey),
+      AppListWidget(),
+      AppearanceWidget(),
+      BehaviorWidget(),
     ];
 
     super.initState();
@@ -47,15 +46,15 @@ class _HomeState extends State<Home> implements IHomeView {
             title: Text('Appearance'),
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.accessibility), title: Text('Behavior'))
+              icon: Icon(Icons.accessibility),
+              title: Text('Behavior')
+          )
         ],
       ),
-      body: Builder(builder: (BuildContext context) {
-        return PageStorage(
-          child: _presenter.pages[_presenter.currentIndex],
-          bucket: _presenter.bucket,
-        );
-      }),
+      body: IndexedStack(
+        index: _presenter.currentIndex,
+        children: _presenter.pages,
+      ),
     );
   }
 

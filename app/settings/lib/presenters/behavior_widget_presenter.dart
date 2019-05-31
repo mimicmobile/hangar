@@ -14,7 +14,4 @@ class BehaviorWidgetPresenter extends PreferenceWidgetPresenter {
     data = BehaviorData();
     super.init();
   }
-
-  @override
-  void handleMessage(String s) {}
 }

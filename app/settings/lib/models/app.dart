@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:settings/config.dart';
 import 'package:settings/utils.dart';
 
 class App {
