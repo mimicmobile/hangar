@@ -17,6 +17,7 @@ class _AppListWidgetState extends State<AppListWidget>
     with WidgetsBindingObserver implements IAppListWidgetView {
   IAppListWidgetPresenter _presenter;
   bool loaded = false;
+  BuildContext _buildContext;
 
   @override
   void initState() {
@@ -52,6 +53,8 @@ class _AppListWidgetState extends State<AppListWidget>
 
   @override
   Widget build(BuildContext context) {
+    _buildContext = context;
+
     return OrientationBuilder(builder: (context, orientation) {
       return Container(
           color: Config.darkBgColor,
@@ -99,5 +102,10 @@ class _AppListWidgetState extends State<AppListWidget>
     } else {
       return Reusable.loadingProgress(orientation);
     }
+  }
+
+  @override
+  BuildContext getContext() {
+    return _buildContext;
   }
 }

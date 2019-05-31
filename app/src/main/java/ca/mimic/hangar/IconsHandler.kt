@@ -152,6 +152,15 @@ class IconsHandler(private val context: Context) {
         return null
     }
 
+    fun generateBitmapFromIconPack(packageName: String, iconPack: String): String? {
+        Utils.getLaunchIntent(context, packageName)?.component?.let {
+            val filename = "${packageName}_generated"
+            val bitmapData = getBitmapForPackage(filename, it, android.os.Process.myUserHandle(), iconPack)
+            cacheStoreBitmap(filename, bitmapData["bitmap"] as Bitmap?)
+            return filename
+        }
+        return null
+    }
 
     private fun getDefaultAppDrawable(componentName: ComponentName, userHandle: UserHandle): Drawable? {
         return try {
@@ -172,7 +181,7 @@ class IconsHandler(private val context: Context) {
     /**
      * Get or generate icon for an app
      */
-    fun getBitmapForPackage(filename: String, componentName: ComponentName, userHandle: UserHandle): Map<String, Any?> {
+    fun getBitmapForPackage(filename: String, componentName: ComponentName, userHandle: UserHandle, iconPack: String? = null): Map<String, Any?> {
         // Search first in cache
         val systemBitmap = cacheGetBitmap(filename)
         if (systemBitmap != null) {
@@ -180,7 +189,7 @@ class IconsHandler(private val context: Context) {
         }
 
         // system icons, nothing to do
-        if (iconsPackPackageName == "default") {
+        if ((iconPack ?: iconsPackPackageName) == "default") {
             return mapOf(
                 "customIcon" to false,
                 "bitmap" to getDefaultAppDrawable(componentName, userHandle)!!.toBitmap()
@@ -189,7 +198,7 @@ class IconsHandler(private val context: Context) {
 
         val drawable = packagesDrawables[componentName.toString()]
         if (drawable != null) { // there is a custom icon
-            val id = iconPackRes.getIdentifier(drawable, "drawable", iconsPackPackageName)
+            val id = iconPackRes.getIdentifier(drawable, "drawable", (iconPack ?: iconsPackPackageName))
             if (id > 0) {
                 try {
                     return mapOf("customIcon" to true, "bitmap" to iconPackRes.getDrawable(id, null).toBitmap())

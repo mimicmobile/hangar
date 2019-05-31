@@ -37,8 +37,8 @@ class Reusable {
       BasicMessageChannel('hangar/native_channel', StringCodec()).send('refresh_notification');
     });
   }
-  static Future<List<List<String>>> fetchIconPacks() async {
-    var s = await BasicMessageChannel('hangar/native_channel', StringCodec()).send('icon_pack_list');
+  static Future<List<List<String>>> fetchIconPacks({packageName = "ca.mimic.hangar"}) async {
+    var s = await BasicMessageChannel('hangar/native_channel', StringCodec()).send('icon_pack_list:$packageName');
     return AppData().getThemesFromJson(s).expand(
             (e) => [
               [e.name, e.packageName, e.cachedFile]
@@ -48,5 +48,9 @@ class Reusable {
 
   static Future<Null> iconPackRebuild() async {
     await BasicMessageChannel('hangar/native_channel', StringCodec()).send('icon_pack_rebuild');
+  }
+
+  static Future<Null> changeIcon(String packageName, String iconPack) async {
+    await BasicMessageChannel('hangar/native_channel', StringCodec()).send('change_icon:$packageName:$iconPack');
   }
 }

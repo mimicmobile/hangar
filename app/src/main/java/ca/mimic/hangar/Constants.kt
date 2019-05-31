@@ -11,9 +11,11 @@ class Constants {
         const val REFRESH_NOTIFICATION_MESSAGE = "refresh_notification"
         const val ICON_PACK_REBUILD_MESSAGE = "icon_pack_rebuild"
         const val ICON_PACK_LIST_MESSAGE = "icon_pack_list"
+        const val CHANGE_ICON_MESSAGE = "change_icon"
         const val SWITCH_APP_PACKAGE_NAME = "ca.mimic.hangar.switch"
         const val RECEIVER_APP_LAUNCHED = "ca.mimic.hangar.APP_LAUNCHED"
         const val RECEIVER_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED"
+        const val ACTION_ADW_PICK_ICON = "org.adw.launcher.icons.ACTION_PICK_ICON"
         // Prefs
         const val PREFS_FILE: String = "FlutterSharedPreferences"
         const val PREF_APP_LIST: String = "flutter.apps"

@@ -83,6 +83,11 @@ class App {
                   child: Text(pinned ? "Remove pin from app" : "Pin app",
                       style:
                           TextStyle(fontSize: 12.0, color: Colors.grey[200]))),
+          PopupMenuItem<String>(
+              value: "change_icon",
+              child: Text("Change icon",
+                  style:
+                  TextStyle(fontSize: 12.0, color: Colors.grey[200]))),
             ],
         child: Row(
           children: <Widget>[

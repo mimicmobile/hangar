@@ -53,23 +53,28 @@ class AppStorage(private val context: Context, private var appListModified: Bool
         filteredPackages(intent)
     }
 
-    fun themesJson(): String {
-        val themesList: MutableList<App> = mutableListOf()
+    fun iconPacksJson(packageName: String): String {
+        val packsList: MutableList<App> = mutableListOf()
+        val iconExists = Utils.iconExists(context, "${packageName}_generated")
+        val defaultFilename = if (iconExists) "${packageName}_generated" else iconsHandler.generateBitmapFromIconPack(
+            packageName,
+            "default"
+        )
 
-        themesList.add(
+        packsList.add(
             App(
                 "Default",
                 "default",
-                cachedFile = Utils.iconFromCache(context, getApp(context.packageName)?.safeCachedFile).absolutePath
+                cachedFile = Utils.iconFromCache(context, defaultFilename).absolutePath
             )
         )
 
-        for (packageName in themes) {
-            val app = newApp(packageName)
+        for (theme in themes) {
+            val app = newApp(theme, skipSave = true)
             app.cachedFile = Utils.iconFromCache(context, app.safeCachedFile).absolutePath
-            themesList.add(app)
+            packsList.add(app)
         }
-        return adapter.toJson(themesList)
+        return adapter.toJson(packsList)
     }
 
     private fun filteredPackages(intent: Intent): ArrayList<String> {
@@ -77,8 +82,8 @@ class AppStorage(private val context: Context, private var appListModified: Bool
         val filteredPackageNames = ArrayList<String>()
         val activityInfoList = pm.queryIntentActivities(intent, 0)
         for (resolveInfo in activityInfoList) {
-            if (resolveInfo.activityInfo != null) {
-                filteredPackageNames.add(resolveInfo.activityInfo.applicationInfo.packageName)
+            resolveInfo.activityInfo?.let {
+                filteredPackageNames.add(it.applicationInfo.packageName)
             }
         }
         return filteredPackageNames
@@ -96,11 +101,19 @@ class AppStorage(private val context: Context, private var appListModified: Bool
         return true
     }
 
+    fun updateAppIcon(packageName: String, filename: String) {
+        getApp(packageName)?.let {
+            it.cachedFile = filename
+            appListModified = true
+            savePrefs()
+        }
+    }
+
     private fun getApp(packageName: String): App? {
         return apps.find { it.packageName == packageName }
     }
 
-    private fun newApp(packageName: String): App {
+    private fun newApp(packageName: String, skipSave: Boolean = false): App {
         val ai = packages.find { it.packageName == packageName }
 
         val installedApp = App(
@@ -113,17 +126,18 @@ class AppStorage(private val context: Context, private var appListModified: Bool
             log("new app: $installedApp")
             generateIcon(context, packageName, installedApp)
 
-            apps.add(installedApp)
+            if (!skipSave) {
+                apps.add(installedApp)
+            }
         }
 
         return installedApp
     }
 
     private fun generateIcon(context: Context, packageName: String, app: App) {
-        val component = Utils.getLaunchIntent(context, packageName)?.component
-        if (component != null) {
+        Utils.getLaunchIntent(context, packageName)?.component?.let {
             val filename = "${packageName}_${System.currentTimeMillis()}"
-            val bitmapData = iconsHandler.getBitmapForPackage(filename, component, android.os.Process.myUserHandle())
+            val bitmapData = iconsHandler.getBitmapForPackage(filename, it, android.os.Process.myUserHandle())
             val cachedIcon = iconsHandler.cacheStoreBitmap(filename, bitmapData["bitmap"] as Bitmap?)
             val customIcon = bitmapData["customIcon"] as Boolean?
 

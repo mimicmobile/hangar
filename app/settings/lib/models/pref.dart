@@ -42,7 +42,7 @@ class RadioChoicePref<T> extends Pref<T> {
 
   Widget rowWidget(context, {Function onTapCallback}) {
     return InkWell(
-      onTap: () => _showRadioDialog(context, onTapCallback),
+      onTap: () => showRadioDialog(context, onTapCallback),
       child: Padding(
           padding:
               const EdgeInsets.only(right: 12, left: 12, top: 17, bottom: 17),
@@ -109,7 +109,7 @@ class RadioChoicePref<T> extends Pref<T> {
     return Row(children: widgets);
   }
 
-  Future<Widget> _showRadioDialog(
+  Future<Widget> showRadioDialog(
       BuildContext context, Function onTapCallback) async {
     return showDialog(
         context: context,
