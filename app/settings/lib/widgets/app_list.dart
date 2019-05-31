@@ -14,8 +14,7 @@ class AppListWidget extends StatefulWidget {
 }
 
 class _AppListWidgetState extends State<AppListWidget>
-    with WidgetsBindingObserver, AutomaticKeepAliveClientMixin<AppListWidget>
-    implements IAppListWidgetView {
+    with WidgetsBindingObserver implements IAppListWidgetView {
   IAppListWidgetPresenter _presenter;
   bool loaded = false;
 
@@ -53,8 +52,6 @@ class _AppListWidgetState extends State<AppListWidget>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-
     return OrientationBuilder(builder: (context, orientation) {
       return Container(
           color: Config.darkBgColor,
@@ -103,7 +100,4 @@ class _AppListWidgetState extends State<AppListWidget>
       return Reusable.loadingProgress(orientation);
     }
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }
