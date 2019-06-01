@@ -8,7 +8,10 @@ import ca.mimic.hangar.Constants.Companion.JOB_ID
 import ca.mimic.hangar.MainActivity.Companion.startJob
 
 class HangarJobService : JobService() {
+    private lateinit var sharedPreferences: SharedPrefsHelper
+
     override fun onStartJob(jp: JobParameters?): Boolean {
+        sharedPreferences = SharedPrefsHelper(this)
         if (!Utils.checkForUsagePermission(this)) {
             Toast.makeText(this, R.string.toast_no_permission, Toast.LENGTH_SHORT).show()
             Utils.cancelJob(this, if (jp?.jobId != null) jp.jobId else INITIAL_JOB_ID)
@@ -19,7 +22,8 @@ class HangarJobService : JobService() {
             var refreshNotifications = true
 
             if (isInstantJob(jp)) {
-                if (SharedPrefsHelper.needsRefresh(this)) {
+                if (sharedPreferences.shouldRefresh()) {
+                    sharedPreferences.resetForceRefresh()
                     Utils.getUsageStats(this, true)
                 }
             } else {
@@ -33,7 +37,7 @@ class HangarJobService : JobService() {
 
         jobFinished(jp, false)
         startJob(this, JOB_ID,
-            SharedPrefsHelper.jobInterval(SharedPrefsHelper.getPrefs(this)),
+            sharedPreferences.jobInterval(),
             this::class.java
         )
 

@@ -49,7 +49,9 @@ class MainActivity : FlutterActivity() {
             when (message[0]) {
                 REFRESH_NOTIFICATION_MESSAGE -> {
                     bgScope.launch {
-                        if (SharedPrefsHelper.needsRefresh(applicationContext)) {
+                        val sharedPreferences = SharedPrefsHelper(applicationContext)
+                        if (sharedPreferences.shouldRefresh()) {
+                            sharedPreferences.resetForceRefresh()
                             Utils.getUsageStats(applicationContext, true)
                         }
                         NotificationShortcuts(applicationContext).create()

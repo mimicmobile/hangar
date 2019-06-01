@@ -8,7 +8,6 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import java.util.ArrayList
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import ca.mimic.hangar.Utils.Companion.log
 import kotlin.math.min
@@ -29,15 +28,13 @@ class AppStorage(private val context: Context, private var appListModified: Bool
         IconsHandler(context)
     }
 
-    private val sharedPrefs: SharedPreferences by lazy {
-        SharedPrefsHelper.getPrefs(context)
-    }
+    private val sharedPreferences = SharedPrefsHelper(context)
 
     private val userWeight: Array<Float> =
-        Constants.weightMap[SharedPrefsHelper.orderPriority(sharedPrefs)] ?: Constants.defaultWeight
+        Constants.weightMap[sharedPreferences.orderPriority()] ?: Constants.defaultWeight
 
     internal val apps: MutableList<App> by lazy {
-        adapter.fromJson(SharedPrefsHelper.appList(sharedPrefs)).orEmpty().toMutableList()
+        adapter.fromJson(sharedPreferences.appList()).orEmpty().toMutableList()
     }
 
     internal val launchers: ArrayList<String> by lazy {
@@ -96,7 +93,7 @@ class AppStorage(private val context: Context, private var appListModified: Bool
 
         val sortedApps = getSortedApps()
         val appJson = adapter.toJson(sortedApps)
-        SharedPrefsHelper.setAppList(sharedPrefs, appJson)
+        sharedPreferences.setAppList(appJson)
 
         return true
     }
@@ -218,10 +215,9 @@ class AppStorage(private val context: Context, private var appListModified: Bool
         val sortedList = apps.filter { !it.pinned }.sortedByDescending { it.sortScore }.toMutableList()
         val pinned = apps.filter { it.pinned }.sortedByDescending { it.sortScore }
 
-        val sharedPrefs = SharedPrefsHelper.getPrefs(context)
-        val fullPageCount = SharedPrefsHelper.appsPerPage(sharedPrefs) - pinned.size
+        val fullPageCount = sharedPreferences.appsPerPage() - pinned.size
 
-        val index = when (SharedPrefsHelper.pinnedAppPlacement(sharedPrefs)) {
+        val index = when (sharedPreferences.pinnedAppPlacement()) {
             Constants.DEFAULT_PINNED_APP_PLACEMENT -> 0  // Pin to front
             else -> getIndex(sortedList, fullPageCount)
         }

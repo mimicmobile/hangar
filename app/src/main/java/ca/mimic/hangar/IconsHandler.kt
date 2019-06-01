@@ -61,7 +61,7 @@ class IconsHandler(private val context: Context) {
      */
     fun loadIconsPack() {
         //clear icons pack
-        iconsPackPackageName = SharedPrefsHelper.iconPack(SharedPrefsHelper.getPrefs(context))
+        iconsPackPackageName = SharedPrefsHelper(context).iconPack()
         log("Load iconPack [$iconsPackPackageName]")
         packagesDrawables.clear()
         backImages.clear()

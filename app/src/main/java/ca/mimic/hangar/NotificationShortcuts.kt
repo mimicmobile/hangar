@@ -31,17 +31,17 @@ class NotificationShortcuts(private val context: Context) {
         AppStorage(context)
     }
 
-    private val sharedPrefs = SharedPrefsHelper.getPrefs(context)
-    private val maxAppsPerRow = SharedPrefsHelper.maxAppsPerRow(sharedPrefs)
-    private val numOfRows = SharedPrefsHelper.numOfRows(sharedPrefs)
-    private val numOfPages = SharedPrefsHelper.numOfPages(sharedPrefs)
-    private val currentPage = SharedPrefsHelper.currentPage(sharedPrefs)
-    private val iconSize = SharedPrefsHelper.iconSize(sharedPrefs)
+    private val sharedPreferences = SharedPrefsHelper(context)
+    private val maxAppsPerRow = sharedPreferences.maxAppsPerRow()
+    private val numOfRows = sharedPreferences.numOfRows()
+    private val numOfPages = sharedPreferences.numOfPages()
+    private val currentPage = sharedPreferences.currentPage()
+    private val iconSize = sharedPreferences.iconSize()
 
     init {
         addRows()
         // Get max apps per-page
-        val appsPerPage = SharedPrefsHelper.appsPerPage(SharedPrefsHelper.getPrefs(context))
+        val appsPerPage = sharedPreferences.appsPerPage()
 
         // Start index for current page
         //          i.e.  appsPerPage = 13 (we take off 1 for page switch icon), currentPage = 3
@@ -90,7 +90,7 @@ class NotificationShortcuts(private val context: Context) {
     }
 
     private fun setBackgroundColor(views: List<RemoteViews>) {
-        val bgColorPref = SharedPrefsHelper.bgColor(sharedPrefs)
+        val bgColorPref = sharedPreferences.bgColor()
         for (view in views) {
             val colorInt = when (bgColorPref) {
                 Constants.PREF_BACKGROUND_COLOR_DARK -> ContextCompat.getColor(context, R.color.darkBg)
