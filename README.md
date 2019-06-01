@@ -2,6 +2,7 @@
 Hangar (3.0?) for Android -- rewritten in Kotlin and Flutter
 Currently a WIP rebuild of the original [Hangar](https://github.com/corcoran/hangar)
 ## TODO
+- Ability to change the 'switch page' icon
 - App shortcuts/Stats widgets
 ## Screenshots
 <a href="screenshots/1.jpg"><img src="screenshots/1.jpg" width="260"></a>
