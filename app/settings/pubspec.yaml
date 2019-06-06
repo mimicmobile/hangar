@@ -94,3 +94,4 @@ flutter:
   module:
     androidPackage: com.example.settings
     iosBundleIdentifier: com.example.settings
+    androidX: true
