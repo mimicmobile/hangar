@@ -33,8 +33,10 @@ class MainActivity : FlutterActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (!startedInstantJob(this)) {
+        if (!Utils.checkForUsagePermission(this)) {
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+        } else {
+            startJob(this, INITIAL_JOB_ID, 0, HangarJobService::class.java)
         }
     }
 
@@ -44,55 +46,28 @@ class MainActivity : FlutterActivity() {
 
         GeneratedPluginRegistrant.registerWith(this)
 
-        channel.setMessageHandler { s, a ->
-            val message = s.split(':')
-            when (message[0]) {
+        channel.setMessageHandler { s, channelCallback ->
+            val messageChannel = MessageChannelParser(s)
+            when (messageChannel.subject) {
                 REFRESH_NOTIFICATION_MESSAGE -> {
-                    bgScope.launch {
-                        val sharedPreferences = SharedPrefsHelper(applicationContext)
-                        if (sharedPreferences.shouldRefresh()) {
-                            sharedPreferences.resetForceRefresh()
-                            Utils.getUsageStats(applicationContext, true)
-                        }
-                        NotificationShortcuts(applicationContext).create()
-                    }
+                    refreshNotifications()
                 }
                 ICON_PACK_REBUILD_MESSAGE -> {
-                    appStorage.iconsHandler.cacheClear()
-                    bgScope.launch {
-                        appStorage.iconsHandler.loadIconsPack()
-
-                        Utils.getUsageStats(applicationContext, true)
-                        NotificationShortcuts(applicationContext).create()
-
-                        channel.send(ICON_PACK_REBUILD_MESSAGE)
-                    }
+                    rebuildIconPacks()
                 }
                 ICON_PACK_LIST_MESSAGE -> {
-                    val b = appStorage.iconPacksJson(message[1])
-                    a.reply(b)
+                    val iconPackJson = getIconPacksJson(messageChannel.packageName)
+                    channelCallback.reply(iconPackJson)
                 }
                 CHANGE_ICON_MESSAGE -> {
-                    selectedAppPackageName = message[1]
+                    selectedAppPackageName = messageChannel.packageName
 
-                    when (message[2]) {
+                    when (messageChannel.launchPackageName) {
                         "default" -> {
-                            bgScope.launch {
-                                appStorage.iconsHandler.generateBitmapFromIconPack(selectedAppPackageName, message[2])
-                                    ?.let {
-                                        appStorage.updateAppIcon(selectedAppPackageName, it)
-
-                                        NotificationShortcuts(applicationContext).create()
-                                        channel.send(ICON_PACK_REBUILD_MESSAGE)
-                                    }
-                            }
+                            generateDefaultIcon(messageChannel.launchPackageName)
                         }
                         else -> {
-                            val intent = Intent().apply {
-                                setPackage(message[2])
-                                action = ACTION_ADW_PICK_ICON
-                            }
-                            startActivityForResult(intent, 1)
+                            launchIconChooser(messageChannel.launchPackageName)
                         }
                     }
 
@@ -101,13 +76,74 @@ class MainActivity : FlutterActivity() {
         }
     }
 
+    private class MessageChannelParser(message: String) {
+        private val messages = message.split(':')
+        val subject = messages[0]
+        val packageName: String by lazy {
+            messages[1]
+        }
+        val launchPackageName: String by lazy {
+            messages[2]
+        }
+    }
+
+    private fun refreshNotifications() {
+        bgScope.launch {
+            val sharedPreferences = SharedPrefsHelper(applicationContext)
+            if (sharedPreferences.shouldRefresh()) {
+                sharedPreferences.resetForceRefresh()
+                Utils.getUsageStats(applicationContext, true)
+            }
+            NotificationShortcuts(applicationContext).create()
+        }
+    }
+
+    private fun rebuildIconPacks() {
+        appStorage.iconsHandler.cacheClear()
+        bgScope.launch {
+            appStorage.iconsHandler.loadIconsPack()
+
+            Utils.getUsageStats(applicationContext, true)
+            NotificationShortcuts(applicationContext).create()
+
+            channel.send(ICON_PACK_REBUILD_MESSAGE)
+        }
+    }
+
+    private fun getIconPacksJson(defaultPackageName: String): String {
+        return appStorage.iconPacksJson(defaultPackageName)
+    }
+
+    private fun generateDefaultIcon(packageName: String) {
+        bgScope.launch {
+            appStorage.iconsHandler.generateBitmapFromIconPack(
+                selectedAppPackageName,
+                packageName
+            )
+                ?.let {
+                    appStorage.updateAppIcon(selectedAppPackageName, it)
+
+                    NotificationShortcuts(applicationContext).create()
+                    channel.send(ICON_PACK_REBUILD_MESSAGE)
+                }
+        }
+    }
+
+    private fun launchIconChooser(launchPackageName: String) {
+        val intent = Intent().apply {
+            setPackage(launchPackageName)
+            action = ACTION_ADW_PICK_ICON
+        }
+        startActivityForResult(intent, 1)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 val bitmap = data?.getParcelableExtra<Bitmap>("icon")
                 val filename = "${selectedAppPackageName}_${System.currentTimeMillis()}"
-                val bitmapStored = appStorage.iconsHandler.cacheStoreBitmap(filename, bitmap)
-                if (bitmapStored) {
+                val hasBitmapStored = appStorage.iconsHandler.cacheStoreBitmap(filename, bitmap)
+                if (hasBitmapStored) {
                     appStorage.updateAppIcon(selectedAppPackageName, filename)
 
                     Utils.getUsageStats(applicationContext, true)
@@ -122,14 +158,6 @@ class MainActivity : FlutterActivity() {
     override fun onDestroy() {
         super.onDestroy()
         job.cancel()
-    }
-
-    private fun startedInstantJob(context: Context): Boolean {
-        if (Utils.checkForUsagePermission(context)) {
-            startJob(context, INITIAL_JOB_ID, 0, HangarJobService::class.java)
-            return true
-        }
-        return false
     }
 
     companion object {

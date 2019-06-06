@@ -32,7 +32,7 @@ import java.util.Random
  * Inspired from http://stackoverflow.com/questions/31490630/how-to-load-icon-from-icon-pack
  */
 
-class IconsHandler(private val context: Context) {
+class IconsHandler(val context: Context) {
     // map with available drawable for an icons pack
     private val packagesDrawables = HashMap<String, String>()
     // instance of a resource object of an icon pack
@@ -154,12 +154,16 @@ class IconsHandler(private val context: Context) {
 
     fun generateBitmapFromIconPack(packageName: String, iconPack: String): String? {
         Utils.getLaunchIntent(context, packageName)?.component?.let {
-            val filename = "${packageName}_generated"
+            val filename = getGeneratedIconFilename(packageName)
             val bitmapData = getBitmapForPackage(filename, it, android.os.Process.myUserHandle(), iconPack)
             cacheStoreBitmap(filename, bitmapData["bitmap"] as Bitmap?)
             return filename
         }
         return null
+    }
+
+    fun getGeneratedIconFilename(packageName: String): String {
+        return "${packageName}_generated"
     }
 
     private fun getDefaultAppDrawable(componentName: ComponentName, userHandle: UserHandle): Drawable? {

@@ -18,6 +18,7 @@ class AppStorage(private val context: Context, private var appListModified: Bool
         MutableList::class.java, App::class.java
     )!!
     private val adapter: JsonAdapter<MutableList<App>> = moshi.adapter(appListType)
+    private val sharedPreferences = SharedPrefsHelper(context)
 
     private val packages: List<ApplicationInfo> by lazy {
         val pm = context.packageManager
@@ -27,8 +28,6 @@ class AppStorage(private val context: Context, private var appListModified: Bool
     val iconsHandler by lazy {
         IconsHandler(context)
     }
-
-    private val sharedPreferences = SharedPrefsHelper(context)
 
     private val userWeight: Array<Float> =
         Constants.weightMap[sharedPreferences.orderPriority()] ?: Constants.defaultWeight
@@ -50,28 +49,51 @@ class AppStorage(private val context: Context, private var appListModified: Bool
         filteredPackages(intent)
     }
 
-    fun iconPacksJson(packageName: String): String {
-        val packsList: MutableList<App> = mutableListOf()
-        val iconExists = Utils.iconExists(context, "${packageName}_generated")
-        val defaultFilename = if (iconExists) "${packageName}_generated" else iconsHandler.generateBitmapFromIconPack(
-            packageName,
-            "default"
-        )
+    fun iconPacksJson(defaultPackageName: String): String {
+        val iconPack = IconPackParser(this, defaultPackageName)
+        return adapter.toJson(iconPack.getPackageList())
+    }
 
-        packsList.add(
-            App(
-                "Default",
-                "default",
-                cachedFile = Utils.iconFromCache(context, defaultFilename).absolutePath
-            )
-        )
+    class IconPackParser(private val appStorage: AppStorage, private val defaultPackageName: String) {
+        private val context: Context = appStorage.iconsHandler.context
+        private val packsList: MutableList<App> = mutableListOf()
+        private val iconFilename = appStorage.iconsHandler.getGeneratedIconFilename(defaultPackageName)
+        private val hasDefaultGeneratedIcon = Utils.iconExists(context, iconFilename)
 
-        for (theme in themes) {
-            val app = newApp(theme, skipSave = true)
-            app.cachedFile = Utils.iconFromCache(context, app.safeCachedFile).absolutePath
-            packsList.add(app)
+        init {
+            if (!hasDefaultGeneratedIcon)
+                generateDefaultIcon()
+
+            buildIconPackList()
         }
-        return adapter.toJson(packsList)
+
+        private fun generateDefaultIcon() {
+            appStorage.iconsHandler.generateBitmapFromIconPack(defaultPackageName, "default")
+        }
+
+        private fun buildIconPackList() {
+            addDefaultIconPack()
+
+            for (theme in appStorage.themes) {
+                val app = appStorage.newApp(theme, skipSave = true)
+                app.cachedFile = Utils.iconFromCache(context, app.safeCachedFile).absolutePath
+                packsList.add(app)
+            }
+        }
+
+        private fun addDefaultIconPack() {
+            packsList.add(
+                App(
+                    "Default",
+                    "default",
+                    cachedFile = Utils.iconFromCache(context, iconFilename).absolutePath
+                )
+            )
+        }
+
+        fun getPackageList(): MutableList<App> {
+            return packsList
+        }
     }
 
     private fun filteredPackages(intent: Intent): ArrayList<String> {
@@ -121,7 +143,7 @@ class AppStorage(private val context: Context, private var appListModified: Bool
 
         if (!installedApp.emptyName()) {
             log("new app: $installedApp")
-            generateIcon(context, packageName, installedApp)
+            generateIcon(packageName, installedApp)
 
             if (!skipSave) {
                 apps.add(installedApp)
@@ -131,7 +153,7 @@ class AppStorage(private val context: Context, private var appListModified: Bool
         return installedApp
     }
 
-    private fun generateIcon(context: Context, packageName: String, app: App) {
+    private fun generateIcon(packageName: String, app: App) {
         Utils.getLaunchIntent(context, packageName)?.component?.let {
             val filename = "${packageName}_${System.currentTimeMillis()}"
             val bitmapData = iconsHandler.getBitmapForPackage(filename, it, android.os.Process.myUserHandle())
@@ -173,7 +195,7 @@ class AppStorage(private val context: Context, private var appListModified: Bool
             log("updated app: $app")
         }
         if (app.cachedIcon && !Utils.iconExists(context, app.safeCachedFile!!)) {
-            generateIcon(context, packageName, app)
+            generateIcon(packageName, app)
 
             appListModified = true
 
@@ -217,16 +239,16 @@ class AppStorage(private val context: Context, private var appListModified: Bool
 
         val fullPageCount = sharedPreferences.appsPerPage() - pinned.size
 
-        val index = when (sharedPreferences.pinnedAppPlacement()) {
+        val pinnedPlacementIndex = when (sharedPreferences.pinnedAppPlacement()) {
             Constants.DEFAULT_PINNED_APP_PLACEMENT -> 0  // Pin to front
-            else -> getIndex(sortedList, fullPageCount)
+            else -> countValidAppsInPage(sortedList, fullPageCount)
         }
 
-        sortedList.addAll(index, pinned)
+        sortedList.addAll(pinnedPlacementIndex, pinned)
         return sortedList
     }
 
-    private fun getIndex(sortedList: MutableList<App>, fullPageCount: Int): Int {
+    private fun countValidAppsInPage(sortedList: MutableList<App>, fullPageCount: Int): Int {
         var indexCount = 0
         var pageCount = 0
 
