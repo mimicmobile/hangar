@@ -9,7 +9,7 @@ import ca.mimic.hangar.Constants.Companion.RECEIVER_BOOT_COMPLETED
 
 class HangarReceiver : BroadcastReceiver() {
     private lateinit var receiverContext: Context
-    private val sharedPreferences = SharedPrefsHelper(receiverContext)
+    private val sharedPreferences by lazy { SharedPrefsHelper(receiverContext) }
 
     override fun onReceive(context: Context, intent: Intent) {
         receiverContext = context
