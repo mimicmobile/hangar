@@ -24,11 +24,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  shared_preferences:
-    git:
-      url: https://github.com/wouterhardeman/plugins
-      path: packages/shared_preferences
-      ref: shared-preferences-refresh-cache
+  shared_preferences: ^0.5.3
   path_provider: ^1.1.0
   intl: ^0.15.8
   sprintf: ^4.0.2

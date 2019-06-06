@@ -14,7 +14,7 @@ class AppData {
     print("Refreshing app list...");
 
     SharedPreferences sharedPreferences = await Utils.getSharedPrefs();
-    await sharedPreferences.refreshCache();
+    await sharedPreferences.reload();
 
     _getAppsFromJson(sharedPreferences.getString("apps") ?? "[]");
   }
