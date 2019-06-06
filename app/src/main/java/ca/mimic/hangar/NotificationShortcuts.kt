@@ -37,34 +37,26 @@ class NotificationShortcuts(private val context: Context) {
     private val numOfPages = sharedPreferences.numOfPages()
     private val currentPage = sharedPreferences.currentPage()
     private val iconSize = sharedPreferences.iconSize()
+    private val appsPerPage = sharedPreferences.appsPerPage()
+
+    private val startOfRange = appsPerPage * (currentPage - 1)
+    private val totalAppsToGet = appsPerPage * numOfPages
 
     init {
         addRows()
-        // Get max apps per-page
-        val appsPerPage = sharedPreferences.appsPerPage()
-
-        // Start index for current page
-        //          i.e.  appsPerPage = 13 (we take off 1 for page switch icon), currentPage = 3
-        //          13 * (3-1) == 26
-        val startIndex: Int = appsPerPage * (currentPage - 1)
-        val totalAppsToGet = appsPerPage * numOfPages
-
         if (isReady()) {
-            val sortedList = appStorage.apps.filter { !it.blacklisted }.take(totalAppsToGet)
-            // Add apps to display on current page
-            var count = 0
-            for (i in startIndex until (min(startIndex + appsPerPage, sortedList.size))) {
-                val app: App = sortedList[i]
-                addApp(count, app)
-                count += 1
+            val appList = appStorage.apps.filter { !it.blacklisted }.take(totalAppsToGet)
+
+            var positionOfApp = 0
+            for (i in startOfRange until endOfRange(appList.size)) {
+                addApp(positionOfApp, appList[i])
+                positionOfApp += 1
             }
 
-            // Add switch page icon if showing multiple pages
             if (numOfPages > 1) {
-                addApp(count, App("Switch page", packageName = SWITCH_APP_PACKAGE_NAME))
+                addSwitchPage(positionOfApp)
             }
 
-            // Create root container
             createRootContainer()
         }
     }
@@ -74,8 +66,32 @@ class NotificationShortcuts(private val context: Context) {
             createNotification()
     }
 
+    private fun addRows() {
+        for (i in 1..numOfRows) {
+            rows.add(RemoteViews(context.packageName, R.layout.notification_row_no_dividers))
+        }
+    }
+
     private fun isReady(): Boolean {
         return appStorage.apps.isNotEmpty()
+    }
+
+    private fun endOfRange(appListSize: Int): Int {
+        return min(startOfRange + appsPerPage, appListSize)
+    }
+
+    private fun addApp(index: Int, app: App) {
+        val row = getRowForApp(index)
+        row?.addView(R.id.notifRow, createAppContainer(app))
+    }
+
+    private fun getRowForApp(appIndex: Int): RemoteViews? {
+        val rowIndex = ceil((appIndex + 1.0) / maxAppsPerRow).toInt() - 1
+        return rows.getOrNull(rowIndex)
+    }
+
+    private fun addSwitchPage(positionOfApp: Int) {
+        addApp(positionOfApp, App("Switch page", packageName = SWITCH_APP_PACKAGE_NAME))
     }
 
     private fun createRootContainer() {
@@ -101,6 +117,24 @@ class NotificationShortcuts(private val context: Context) {
         }
     }
 
+    private fun createNotification() {
+        getOrCreateChannel()
+
+        val builder = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
+            .setContentTitle("Hangar")
+            .setContentText("Hangar")
+            .setSmallIcon(R.drawable.notification_small_icon)
+            .setCustomContentView(root)
+            .setOngoing(true)
+            .setWhen(System.currentTimeMillis())
+            .setPriority(PRIORITY_MAX)
+            .setCustomBigContentView(expanded)
+            .setVisibility(VISIBILITY_PUBLIC)
+
+        val notification = builder.build()
+        getNotificationManager().notify(NOTIFICATION_ID, notification)
+    }
+
     private fun getOrCreateChannel(): NotificationChannel? {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationManager = getNotificationManager()
@@ -123,37 +157,9 @@ class NotificationShortcuts(private val context: Context) {
         return null
     }
 
-    private fun createNotification() {
-        getOrCreateChannel()
-
-        val builder = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("Hangar")
-            .setContentText("Hangar")
-            .setSmallIcon(R.drawable.notification_small_icon)
-            .setCustomContentView(root)
-            .setOngoing(true)
-            .setWhen(System.currentTimeMillis())
-            .setPriority(PRIORITY_MAX)
-            .setCustomBigContentView(expanded)
-            .setVisibility(VISIBILITY_PUBLIC)
-
-        val notification = builder.build()
-        getNotificationManager().notify(NOTIFICATION_ID, notification)
-    }
 
     private fun getNotificationManager(): NotificationManager {
         return context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-    }
-
-    private fun addRows() {
-        for (i in 1..numOfRows) {
-            rows.add(RemoteViews(context.packageName, R.layout.notification_row_no_dividers))
-        }
-    }
-
-    private fun addApp(index: Int, app: App) {
-        val row = getRowForApp(index)
-        row?.addView(R.id.notifRow, createAppContainer(app))
     }
 
     private fun createAppContainer(app: App): RemoteViews {
@@ -188,10 +194,5 @@ class NotificationShortcuts(private val context: Context) {
         )
 
         appContainer.setOnClickPendingIntent(R.id.imageCont, activity)
-    }
-
-    private fun getRowForApp(appIndex: Int): RemoteViews? {
-        val rowIndex = ceil((appIndex + 1.0) / maxAppsPerRow).toInt() - 1
-        return rows.getOrNull(rowIndex)
     }
 }
