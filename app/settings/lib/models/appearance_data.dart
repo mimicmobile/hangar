@@ -9,7 +9,7 @@ class AppearanceData extends PreferenceData {
     var iconPackList = await Reusable.fetchIconPacks();
 
     prefSet.add(PrefSet("Notification", [
-      RadioChoicePref<int>(
+      MultipleChoicePref<int>(
           "appsPerRow",
           "Number of apps",
           ["%s per row"],
@@ -20,7 +20,7 @@ class AppearanceData extends PreferenceData {
             ["7", 7],
             ["8", 8]
           ]),
-      RadioChoicePref<int>(
+      MultipleChoicePref<int>(
           "numRows",
           "Number of rows",
           ["%s rows", "%s row"],
@@ -31,7 +31,7 @@ class AppearanceData extends PreferenceData {
             ["2", 2],
             ["3", 3]
           ]),
-      RadioChoicePref<int>(
+      MultipleChoicePref<int>(
           "numPages",
           "Number of pages",
           ["%s pages", "%s page"],
@@ -42,7 +42,7 @@ class AppearanceData extends PreferenceData {
             ["2", 2],
             ["3", 3]
           ]),
-      RadioChoicePref<String>(
+      MultipleChoicePref<String>(
           "backgroundColor",
           "Background color",
           ["%s"],
@@ -53,7 +53,7 @@ class AppearanceData extends PreferenceData {
             ["Material Dark", "materialDark"],
             ["Black", "black"]
           ]),
-      RadioChoicePref<String>(
+      MultipleChoicePref<String>(
           "pinnedAppPlacement",
           "Pinned app placement",
           ["%s"],
@@ -65,7 +65,7 @@ class AppearanceData extends PreferenceData {
           ])
     ]));
     prefSet.add(PrefSet("Icons", [
-      RadioChoicePref<String>(
+      MultipleChoicePref<String>(
           "iconSize",
           "Icon size",
           ["%s"],
@@ -76,7 +76,7 @@ class AppearanceData extends PreferenceData {
             ["Medium", "medium"],
             ["Large", "large"]
           ]),
-      RadioChoicePref<String>(
+      MultipleChoicePref<String>(
           "iconPack", "Icon pack", ["%s"], sp, "default", iconPackList,
           previewIcon: true)
     ]));

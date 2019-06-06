@@ -7,7 +7,7 @@ class BehaviorData extends PreferenceData {
     var sp = await Utils.getSharedPrefs();
 
     prefSet.add(PrefSet("Notification", [
-      RadioChoicePref<int>(
+      MultipleChoicePref<int>(
           "jobInterval",
           "Update interval",
           ["Every %s"],
@@ -24,7 +24,7 @@ class BehaviorData extends PreferenceData {
           ])
     ]));
     prefSet.add(PrefSet("Sorting", [
-      RadioChoicePref<String>(
+      MultipleChoicePref<String>(
           "notificationWeight",
           "Order priority",
           ["%s"],

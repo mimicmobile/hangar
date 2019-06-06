@@ -26,6 +26,7 @@ import kotlinx.coroutines.*
 class MainActivity : FlutterActivity() {
     private val job = Job()
     private val bgScope = CoroutineScope(Dispatchers.Default + job)
+    private val uiScope = CoroutineScope(Dispatchers.Main + job)
     private val appStorage by lazy { AppStorage(this) }
     private val channel by lazy { BasicMessageChannel<String>(flutterView, FLUTTER_CHANNEL, StringCodec.INSTANCE) }
     private lateinit var selectedAppPackageName: String
@@ -106,7 +107,9 @@ class MainActivity : FlutterActivity() {
             Utils.getUsageStats(applicationContext, true)
             NotificationShortcuts(applicationContext).create()
 
-            channel.send(ICON_PACK_REBUILD_MESSAGE)
+            uiScope.launch {
+                channel.send(ICON_PACK_REBUILD_MESSAGE)
+            }
         }
     }
 
@@ -124,7 +127,9 @@ class MainActivity : FlutterActivity() {
                     appStorage.updateAppIcon(selectedAppPackageName, it)
 
                     NotificationShortcuts(applicationContext).create()
-                    channel.send(ICON_PACK_REBUILD_MESSAGE)
+                    uiScope.launch {
+                        channel.send(ICON_PACK_REBUILD_MESSAGE)
+                    }
                 }
         }
     }

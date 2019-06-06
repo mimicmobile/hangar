@@ -31,11 +31,11 @@ class Pref<T> {
   }
 }
 
-class RadioChoicePref<T> extends Pref<T> {
+class MultipleChoicePref<T> extends Pref<T> {
   final List<List<Object>> choices;
   final bool previewIcon;
 
-  RadioChoicePref(
+  MultipleChoicePref(
       key, title, description, SharedPreferences sp, def, this.choices,
       {this.previewIcon = false})
       : super(key, title, description, sp, def);
@@ -83,7 +83,7 @@ class RadioChoicePref<T> extends Pref<T> {
       String key, T _value, Function onTapCallback) {
     return RadioListTile(
       activeColor: Config.accentColor,
-      title: _getRadioChildTitle(label, icon),
+      title: _getMultipleChoiceChildTitle(label, icon),
       groupValue: _value,
       value: choice,
       onChanged: (v) {
@@ -94,7 +94,18 @@ class RadioChoicePref<T> extends Pref<T> {
     );
   }
 
-  Row _getRadioChildTitle(String label, String icon) {
+  Widget _getListChild(context, String label, T choice, String icon, T _value,
+      Function onTapCallback) {
+    return ListTile(
+      title: _getMultipleChoiceChildTitle(label, icon),
+      onTap: () {
+        onTapCallback(null, choice);
+        Navigator.pop(context);
+      },
+    );
+  }
+
+  Row _getMultipleChoiceChildTitle(String label, String icon) {
     List<Widget> widgets = <Widget>[];
 
     if (icon != null) {
@@ -128,8 +139,22 @@ class RadioChoicePref<T> extends Pref<T> {
             ));
   }
 
+  Future<Widget> showListDialog(
+      BuildContext context, Function onTapCallback) async {
+    return showDialog(
+        context: context,
+        builder: (context) => SimpleDialog(
+              title: Text(sprintf(title, [value[key]])),
+              children: choices
+                  .map((e) => _getListChild(context, e[0], e[1],
+                      e.length == 3 ? e[2] : null, value[key], onTapCallback))
+                  .toList(),
+            ));
+  }
+
   String _getPlural() {
-    var label = choices.singleWhere((l) => l[1] == value[key], orElse: () => choices[0] as List<T>)[0];
+    var label = choices.singleWhere((l) => l[1] == value[key],
+        orElse: () => choices[0] as List<T>)[0];
     final String def = sprintf(description[0], [label]);
 
     if (value[key] is int && description.length > 1) {

@@ -39,10 +39,10 @@ class AppListWidgetPresenter implements IAppListWidgetPresenter {
         var sp = await Utils.getSharedPrefs();
         var iconPackList = await Reusable.fetchIconPacks(packageName: packageName);
 
-        var pref = RadioChoicePref<String>(
+        var pref = MultipleChoicePref<String>(
             "iconPack", "Choose from icon pack", ["%s"], sp, "default", iconPackList,
             previewIcon: true);
-        pref.showRadioDialog(_view.getContext(), iconPackSelected);
+        pref.showListDialog(_view.getContext(), iconPackSelected);
     }
   }
 
