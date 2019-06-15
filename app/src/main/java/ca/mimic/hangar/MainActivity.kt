@@ -17,10 +17,9 @@ import ca.mimic.hangar.Constants.Companion.ICON_PACK_REBUILD_MESSAGE
 import ca.mimic.hangar.Constants.Companion.INITIAL_JOB_ID
 import ca.mimic.hangar.Constants.Companion.REFRESH_NOTIFICATION_MESSAGE
 import io.flutter.app.FlutterActivity
-import io.flutter.plugin.common.BasicMessageChannel
+import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
 import io.flutter.view.FlutterMain
-import io.flutter.plugin.common.StringCodec
 import kotlinx.coroutines.*
 
 class MainActivity : FlutterActivity() {
@@ -28,7 +27,7 @@ class MainActivity : FlutterActivity() {
     private val bgScope = CoroutineScope(Dispatchers.Default + job)
     private val uiScope = CoroutineScope(Dispatchers.Main + job)
     private val appStorage by lazy { AppStorage(this) }
-    private val channel by lazy { BasicMessageChannel<String>(flutterView, FLUTTER_CHANNEL, StringCodec.INSTANCE) }
+    private val channel by lazy { MethodChannel(flutterView, FLUTTER_CHANNEL) }
     private lateinit var selectedAppPackageName: String
 
     override fun onResume() {
@@ -47,9 +46,11 @@ class MainActivity : FlutterActivity() {
 
         GeneratedPluginRegistrant.registerWith(this)
 
-        channel.setMessageHandler { s, channelCallback ->
-            val messageChannel = MessageChannelParser(s)
-            when (messageChannel.subject) {
+        channel.setMethodCallHandler { call, result ->
+            val packageName = call.argument<String>("packageName")
+            val launchPackageName = call.argument<String>("launchPackageName")
+
+            when (call.method) {
                 REFRESH_NOTIFICATION_MESSAGE -> {
                     refreshNotifications()
                 }
@@ -57,34 +58,23 @@ class MainActivity : FlutterActivity() {
                     rebuildIconPacks()
                 }
                 ICON_PACK_LIST_MESSAGE -> {
-                    val iconPackJson = getIconPacksJson(messageChannel.packageName)
-                    channelCallback.reply(iconPackJson)
+                    val iconPackJson = getIconPacksJson(packageName)
+                    result.success(iconPackJson)
                 }
                 CHANGE_ICON_MESSAGE -> {
-                    selectedAppPackageName = messageChannel.packageName
+                    selectedAppPackageName = packageName!!
 
-                    when (messageChannel.launchPackageName) {
+                    when (launchPackageName) {
                         "default" -> {
-                            generateDefaultIcon(messageChannel.launchPackageName)
+                            generateDefaultIcon(launchPackageName)
                         }
                         else -> {
-                            launchIconChooser(messageChannel.launchPackageName)
+                            launchIconChooser(launchPackageName)
                         }
                     }
 
                 }
             }
-        }
-    }
-
-    private class MessageChannelParser(message: String) {
-        private val messages = message.split(':')
-        val subject = messages[0]
-        val packageName: String by lazy {
-            messages[1]
-        }
-        val launchPackageName: String by lazy {
-            messages[2]
         }
     }
 
@@ -108,13 +98,13 @@ class MainActivity : FlutterActivity() {
             NotificationShortcuts(applicationContext).create()
 
             uiScope.launch {
-                channel.send(ICON_PACK_REBUILD_MESSAGE)
+                channel.invokeMethod(ICON_PACK_REBUILD_MESSAGE, null)
             }
         }
     }
 
-    private fun getIconPacksJson(defaultPackageName: String): String {
-        return appStorage.iconPacksJson(defaultPackageName)
+    private fun getIconPacksJson(defaultPackageName: String?): String {
+        return appStorage.iconPacksJson(defaultPackageName!!)
     }
 
     private fun generateDefaultIcon(packageName: String) {
@@ -128,15 +118,15 @@ class MainActivity : FlutterActivity() {
 
                     NotificationShortcuts(applicationContext).create()
                     uiScope.launch {
-                        channel.send(ICON_PACK_REBUILD_MESSAGE)
+                        channel.invokeMethod(ICON_PACK_REBUILD_MESSAGE, null)
                     }
                 }
         }
     }
 
-    private fun launchIconChooser(launchPackageName: String) {
+    private fun launchIconChooser(launchPackageName: String?) {
         val intent = Intent().apply {
-            setPackage(launchPackageName)
+            setPackage(launchPackageName!!)
             action = ACTION_ADW_PICK_ICON
         }
         startActivityForResult(intent, 1)
@@ -153,7 +143,7 @@ class MainActivity : FlutterActivity() {
 
                     Utils.getUsageStats(applicationContext, true)
                     NotificationShortcuts(applicationContext).create()
-                    channel.send(ICON_PACK_REBUILD_MESSAGE)
+                    channel.invokeMethod(ICON_PACK_REBUILD_MESSAGE, null)
                 }
             }
         }

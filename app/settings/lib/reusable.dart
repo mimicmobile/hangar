@@ -7,9 +7,10 @@ class Reusable {
   static loadingProgress(orientation) {
     return Padding(
         padding:
-        EdgeInsets.only(top: 100.0, right: 20.0, left: 20.0, bottom: 40.0),
+            EdgeInsets.only(top: 100.0, right: 20.0, left: 20.0, bottom: 40.0),
         child: Center(child: CircularProgressIndicator()));
   }
+
   static showSnackBar(BuildContext context, String text,
       {duration: 1400, String actionText, Function actionCallback}) {
     Future.delayed(Duration.zero, () {
@@ -30,27 +31,38 @@ class Reusable {
       Scaffold.of(context).showSnackBar(snackBar);
     });
   }
+
   static refreshNotification() {
     return Utils.getSharedPrefs().then((sp) async {
       sp.setBool("forceRefresh", true);
 
-      BasicMessageChannel('hangar/native_channel', StringCodec()).send('refresh_notification');
+      MethodChannel('hangar/native_channel')
+          .invokeMethod('refresh_notification');
     });
   }
-  static Future<List<List<String>>> fetchIconPacks({packageName = "ca.mimic.hangar"}) async {
-    var s = await BasicMessageChannel('hangar/native_channel', StringCodec()).send('icon_pack_list:$packageName');
-    return AppData().getThemesFromJson(s).expand(
-            (e) => [
+
+  static Future<List<List<String>>> fetchIconPacks(
+      {packageName = "ca.mimic.hangar"}) async {
+    var s = await MethodChannel('hangar/native_channel').invokeMethod(
+        'icon_pack_list', <String, String>{"packageName": packageName});
+    return AppData()
+        .getThemesFromJson(s)
+        .expand((e) => [
               [e.name, e.packageName, e.cachedFile]
-            ]
-    ).toList();
+            ])
+        .toList();
   }
 
   static Future<Null> iconPackRebuild() async {
-    await BasicMessageChannel('hangar/native_channel', StringCodec()).send('icon_pack_rebuild');
+    await MethodChannel('hangar/native_channel')
+        .invokeMethod('icon_pack_rebuild');
   }
 
   static Future<Null> changeIcon(String packageName, String iconPack) async {
-    await BasicMessageChannel('hangar/native_channel', StringCodec()).send('change_icon:$packageName:$iconPack');
+    await MethodChannel('hangar/native_channel').invokeMethod(
+        'change_icon', <String, String>{
+      "packageName": packageName,
+      "launchPackageName": iconPack
+    });
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:settings/models/preference_data.dart';
 
 abstract class IHomePresenter {
@@ -9,7 +10,7 @@ abstract class IAppListWidgetPresenter {
   void init() {}
   void appTap(String packageName, String key) {}
   refreshApps() {}
-  void handleMessage(String s) {}
+  void handleMessage(MethodCall call) {}
 }
 
 abstract class IPreferenceWidgetPresenter {

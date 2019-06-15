@@ -18,9 +18,8 @@ class AppListWidgetPresenter implements IAppListWidgetPresenter {
     appData = AppData();
     refreshApps();
 
-    BasicMessageChannel('hangar/native_channel', StringCodec())
-        .setMessageHandler((s) {
-      handleMessage(s);
+    MethodChannel('hangar/native_channel').setMethodCallHandler((call) {
+      handleMessage(call);
     });
   }
 
@@ -37,10 +36,12 @@ class AppListWidgetPresenter implements IAppListWidgetPresenter {
         break;
       case "change_icon":
         var sp = await Utils.getSharedPrefs();
-        var iconPackList = await Reusable.fetchIconPacks(packageName: packageName);
+        var iconPackList = await Reusable.fetchIconPacks(
+            packageName: packageName);
 
         var pref = MultipleChoicePref<String>(
-            "iconPack", "Choose from icon pack", ["%s"], sp, "default", iconPackList,
+            "iconPack", "Choose from icon pack", ["%s"], sp, "default",
+            iconPackList,
             previewIcon: true);
         pref.showListDialog(_view.getContext(), iconPackSelected);
     }
@@ -56,8 +57,8 @@ class AppListWidgetPresenter implements IAppListWidgetPresenter {
   }
 
   @override
-  void handleMessage(String s) {
-    switch (s) {
+  void handleMessage(MethodCall call) async {
+    switch (call.method) {
       case "icon_pack_rebuild":
         refreshApps();
     }
