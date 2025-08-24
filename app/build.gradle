@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId "ca.mimic.hangar"
-        minSdk 21
+        minSdk 24
         compileSdkVersion 36
         targetSdk 30
         versionCode 34000
@@ -41,6 +41,7 @@ android {
             signingConfig signingConfigs.release
         }
         debug {
+            debuggable true
             signingConfig signingConfigs.release
         }
     }
@@ -69,30 +70,51 @@ android {
     buildToolsVersion '35.0.0'
 }
 
+def flutterDir = "$rootDir/app/settings"
+def flutterCmd = System.getenv("FLUTTER_CMD") ?: "fvm flutter"
+def javaHome17 = System.getenv("JAVA_17") ?: "/usr/lib/jvm/java-17-openjdk"
+def flutterRepo = file("$flutterDir/build/host/outputs/repo")
+
+tasks.register("flutterBuildAarDebug", Exec) {
+    workingDir flutterDir
+    environment "JAVA_HOME", javaHome17
+    commandLine "bash", "-lc", "${flutterCmd} build aar --debug --no-profile --no-release --target-platform=android-arm64"
+    inputs.files(file("$flutterDir/pubspec.lock"), fileTree("$flutterDir/lib"), fileTree("$flutterDir/android"))
+    outputs.dir(flutterRepo)
+}
+
+tasks.register("flutterBuildAarRelease", Exec) {
+    workingDir flutterDir
+    environment "JAVA_HOME", javaHome17
+    commandLine "bash", "-lc", "${flutterCmd} build aar --release --no-debug --no-profile --target-platform=android-arm64"
+    inputs.files(file("$flutterDir/pubspec.lock"), fileTree("$flutterDir/lib"), fileTree("$flutterDir/android"))
+    outputs.dir(flutterRepo)
+}
+
+tasks.configureEach { t ->
+    if (t.name == "preDebugBuild") t.dependsOn("flutterBuildAarDebug")
+    if (t.name == "preReleaseBuild") t.dependsOn("flutterBuildAarRelease")
+}
+
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
-    // keep your old AndroidX versions if you want minimal churn
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.core:core-ktx:1.17.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'com.google.android.material:material:1.12.0'
 
-    // bump coroutines to work well with modern Kotlin
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
 
-    // bump Moshi and use KSP codegen
     implementation "com.squareup.moshi:moshi:1.15.2"
     implementation "com.squareup.moshi:moshi-kotlin:1.15.2"
-    // ksp "com.squareup.moshi:moshi-kotlin-codegen:1.15.2"
 
     testImplementation "junit:junit:4.13.2"
     androidTestImplementation 'androidx.test:runner:1.7.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
 
-    // Flutter AARs (from your local repo)
-    debugImplementation   "com.example.settings:flutter_debug:1.0"
+    debugImplementation "com.example.settings:flutter_debug:1.0"
     releaseImplementation "com.example.settings:flutter_release:1.0"
 }
 

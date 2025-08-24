@@ -13,3 +13,4 @@ gradle.properties
 key.properties
 app/settings/.android
 .kotlin
+**.fvmrc
