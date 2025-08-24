@@ -1,7 +1,7 @@
 plugins {
     id "com.android.application"
     id "org.jetbrains.kotlin.android"
-    id "com.google.devtools.ksp"
+    id "kotlin-kapt"
 }
 
 def keystorePropertiesFile = rootProject.file("key.properties")
@@ -12,11 +12,11 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "ca.mimic.hangar"
-    compileSdk 35
 
     defaultConfig {
         applicationId "ca.mimic.hangar"
         minSdk 21
+        compileSdkVersion 36
         targetSdk 30
         versionCode 34000
         versionName "3.4.0"
@@ -66,29 +66,30 @@ android {
             ]
         }
     }
+    buildToolsVersion '35.0.0'
 }
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
     // keep your old AndroidX versions if you want minimal churn
-    implementation "androidx.appcompat:appcompat:1.1.0-beta01"
-    implementation "androidx.core:core-ktx:1.2.0-alpha01"
-    implementation "androidx.constraintlayout:constraintlayout:1.1.3"
-    implementation "com.google.android.material:material:1.1.0-alpha07"
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.core:core-ktx:1.17.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation 'com.google.android.material:material:1.12.0'
 
     // bump coroutines to work well with modern Kotlin
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
 
     // bump Moshi and use KSP codegen
     implementation "com.squareup.moshi:moshi:1.15.2"
     implementation "com.squareup.moshi:moshi-kotlin:1.15.2"
-    ksp "com.squareup.moshi:moshi-kotlin-codegen:1.15.2"
+    // ksp "com.squareup.moshi:moshi-kotlin-codegen:1.15.2"
 
     testImplementation "junit:junit:4.13.2"
-    androidTestImplementation "androidx.test:runner:1.2.0"
-    androidTestImplementation "androidx.test.espresso:espresso-core:3.2.0"
+    androidTestImplementation 'androidx.test:runner:1.7.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
 
     // Flutter AARs (from your local repo)
     debugImplementation   "com.example.settings:flutter_debug:1.0"

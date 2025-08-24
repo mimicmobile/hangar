@@ -12,3 +12,4 @@ gradle.properties
 *.keystore
 key.properties
 app/settings/.android
+.kotlin
