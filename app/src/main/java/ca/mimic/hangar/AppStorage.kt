@@ -10,13 +10,15 @@ import java.util.ArrayList
 import android.content.Intent
 import android.graphics.Bitmap
 import ca.mimic.hangar.Utils.Companion.log
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlin.math.min
 
 class AppStorage(private val context: Context, private var appListModified: Boolean = false) {
-    private var moshi: Moshi = Moshi.Builder().build()
-    private val appListType = Types.newParameterizedType(
-        MutableList::class.java, App::class.java
-    )!!
+    private val moshi = Moshi.Builder()
+        .addLast(KotlinJsonAdapterFactory())
+        .build()
+
+    private val appListType = Types.newParameterizedType(MutableList::class.java, App::class.java)
     private val adapter: JsonAdapter<MutableList<App>> = moshi.adapter(appListType)
     private val sharedPreferences = SharedPrefsHelper(context)
 

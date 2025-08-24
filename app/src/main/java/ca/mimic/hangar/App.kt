@@ -1,8 +1,5 @@
 package ca.mimic.hangar
 
-import com.squareup.moshi.JsonClass
-
-@JsonClass(generateAdapter = true)
 data class App(
     val name: String?,
     val packageName: String,
