@@ -7,15 +7,22 @@ abstract class IHomePresenter {
 
 abstract class IAppListWidgetPresenter {
   get appData => null;
+
   void init() {}
+
   void appTap(String packageName, String key) {}
-  refreshApps() {}
+
+  Future<void> refreshApps() async {}
+
   void handleMessage(MethodCall call) {}
 }
 
 abstract class IPreferenceWidgetPresenter {
-  PreferenceData get data => null;
+  PreferenceData? get data => null;
+
   void loaded() {}
+
   void init() {}
+
   void prefTap(String pref, Object value) {}
 }

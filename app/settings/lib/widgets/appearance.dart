@@ -3,7 +3,7 @@ import 'package:settings/presenters/appearance_widget_presenter.dart';
 import 'package:settings/widgets/preference.dart';
 
 class AppearanceWidget extends PreferenceWidget {
-  const AppearanceWidget({Key key}) : super(key: key);
+  const AppearanceWidget({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _AppearanceWidgetState();

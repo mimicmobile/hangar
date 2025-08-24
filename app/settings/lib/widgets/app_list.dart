@@ -6,7 +6,7 @@ import 'package:settings/presenters/app_list_widget_presenter.dart';
 import 'package:settings/reusable.dart';
 
 class AppListWidget extends StatefulWidget {
-  const AppListWidget({Key key})
+  const AppListWidget({Key? key})
       : super(key: key);
 
   @override
@@ -15,9 +15,9 @@ class AppListWidget extends StatefulWidget {
 
 class _AppListWidgetState extends State<AppListWidget>
     with WidgetsBindingObserver implements IAppListWidgetView {
-  IAppListWidgetPresenter _presenter;
+  late IAppListWidgetPresenter _presenter;
   bool loaded = false;
-  BuildContext _buildContext;
+  late BuildContext _buildContext;
 
   @override
   void initState() {

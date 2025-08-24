@@ -5,13 +5,12 @@ import 'package:settings/presenters/preference_widget_presenter.dart';
 
 class BehaviorWidgetPresenter extends PreferenceWidgetPresenter {
   final IPreferenceWidgetView _view;
-  PreferenceData data;
+  PreferenceData data = BehaviorData();
 
   BehaviorWidgetPresenter(this._view) : super(_view);
 
   @override
   void init() async {
-    data = BehaviorData();
     super.init();
   }
 }

@@ -6,10 +6,10 @@ import 'package:settings/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppData {
-  List<App> apps;
-  String cachePath;
+  late List<App> apps;
+  late String cachePath;
 
-  Future refresh() async {
+  Future<void> refresh() async {
     cachePath = await Utils.cachePath;
     print("Refreshing app list...");
 
@@ -19,7 +19,7 @@ class AppData {
     _getAppsFromJson(sharedPreferences.getString("apps") ?? "[]");
   }
 
-  Future save() async {
+  Future<void> save() async {
     Utils.getSharedPrefs().then((SharedPreferences sp) {
       sp.setString("apps", _toJson(apps));
       print("Saved ${apps.length} apps to SharedPrefs");
@@ -62,7 +62,7 @@ class AppData {
     return apps.isEmpty;
   }
 
-  Widget rowWidget(context, orientation, index, {Function onTapCallback}) {
+  Widget rowWidget(context, orientation, index, {required Function onTapCallback}) {
     return apps[index]
         .rowWidget(context, cachePath, onTapCallback: onTapCallback);
   }

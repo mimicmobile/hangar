@@ -8,17 +8,16 @@ import 'package:settings/utils.dart';
 
 class AppListWidgetPresenter implements IAppListWidgetPresenter {
   final IAppListWidgetView _view;
-  AppData appData;
-  String selectedAppPackageName;
+  AppData appData = AppData();
+  late String selectedAppPackageName;
 
   AppListWidgetPresenter(this._view);
 
   @override
   void init() async {
-    appData = AppData();
     refreshApps();
 
-    MethodChannel('hangar/native_channel').setMethodCallHandler((call) {
+    MethodChannel('hangar/native_channel').setMethodCallHandler((call) async {
       handleMessage(call);
     });
   }
@@ -57,11 +56,12 @@ class AppListWidgetPresenter implements IAppListWidgetPresenter {
   }
 
   @override
-  void handleMessage(MethodCall call) async {
+  Future<Object?> handleMessage(MethodCall call) async {
     switch (call.method) {
       case "icon_pack_rebuild":
         refreshApps();
     }
+    return null;
   }
 
   void iconPackSelected(String _, String choice) {

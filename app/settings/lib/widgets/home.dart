@@ -13,7 +13,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> implements IHomeView {
-  HomePresenter _presenter;
+  late HomePresenter _presenter;
 
   @override
   void initState() {

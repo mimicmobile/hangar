@@ -3,7 +3,7 @@ import 'package:settings/presenters/behavior_widget_presenter.dart';
 import 'package:settings/widgets/preference.dart';
 
 class BehaviorWidget extends PreferenceWidget {
-  const BehaviorWidget({Key key}) : super(key: key);
+  const BehaviorWidget({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _BehaviorWidgetState();

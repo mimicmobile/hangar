@@ -21,7 +21,7 @@ class App {
   bool customIcon;
   String cachedFile;
 
-  String totalTimeReadable;
+  late String totalTimeReadable;
 
   App(
       this.name,
@@ -63,7 +63,7 @@ class App {
     return time += "${duration.inMinutes - (duration.inHours * 60)}m";
   }
 
-  Widget rowWidget(context, cachePath, {Function onTapCallback}) {
+  Widget rowWidget(context, cachePath, {required onTapCallback}) {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: PopupMenuButton(
@@ -118,7 +118,7 @@ class App {
     var widgets = [
       Image.file(
           Utils.cachedFileImage(
-              cachePath, cachedFile != null ? cachedFile : packageName),
+              cachePath, cachedFile),
           height: 46)
     ];
 

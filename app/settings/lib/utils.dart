@@ -5,7 +5,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Utils {
-  static String _cacheFileName(String path, String packageName) {
+  static String _cacheFileName(String path, String? packageName) {
+    if (packageName == null) {
+      return path;
+
+    }
     return join(path, '$packageName.png');
   }
 
@@ -14,8 +18,8 @@ class Utils {
     return directory.path;
   }
 
-  static File cachedFileImage(String path, String packageName) {
-    return File(packageName != null ? _cacheFileName(path, packageName) : path);
+  static File cachedFileImage(String path, String? packageName) {
+    return File(_cacheFileName(path, packageName));
   }
 
   static Future<SharedPreferences> getSharedPrefs() async {

@@ -8,7 +8,7 @@ class HomePresenter implements IHomePresenter {
   HomePresenter(this._view);
   int currentIndex = 0;
 
-  List<Widget> pages;
+  late List<Widget> pages;
 
   @override
   void init() {

@@ -26,7 +26,7 @@ class Pref<T> {
     }
   }
 
-  Widget rowWidget(context, {Function onTapCallback}) {
+  Widget rowWidget(context, {required Function onTapCallback}) {
     return Padding(padding: const EdgeInsets.all(12));
   }
 }
@@ -40,7 +40,7 @@ class MultipleChoicePref<T> extends Pref<T> {
       {this.previewIcon = false})
       : super(key, title, description, sp, def);
 
-  Widget rowWidget(context, {Function onTapCallback}) {
+  Widget rowWidget(context, {required Function onTapCallback}) {
     return InkWell(
       onTap: () => showRadioDialog(context, onTapCallback),
       child: Padding(
@@ -59,12 +59,18 @@ class MultipleChoicePref<T> extends Pref<T> {
     var widgets = <Widget>[];
 
     if (this.previewIcon) {
-      var path = choices.singleWhere((l) => l[1] == value[key],
-          orElse: () => choices[0] as List<T>)[2];
+      final typedChoices = choices.cast<List<Object>>();
+      final String keyVal = value[key] as String;
+
+      final path = typedChoices.singleWhere(
+        (l) => l.length > 2 && l[1].toString() == keyVal,
+        orElse: () => typedChoices.first,
+      )[2];
 
       widgets.add(Padding(
         padding: EdgeInsets.only(right: 14),
-        child: Image.file(Utils.cachedFileImage(path, null), height: 46),
+        child: Image.file(Utils.cachedFileImage(path.toString(), null),
+            height: 46),
       ));
     }
 
@@ -79,7 +85,7 @@ class MultipleChoicePref<T> extends Pref<T> {
     return widgets;
   }
 
-  Widget _getRadioChild(context, String label, T choice, String icon,
+  Widget _getRadioChild(context, String label, T choice, String? icon,
       String key, T _value, Function onTapCallback) {
     return RadioListTile(
       activeColor: Config.accentColor,
@@ -94,7 +100,7 @@ class MultipleChoicePref<T> extends Pref<T> {
     );
   }
 
-  Widget _getListChild(context, String label, T choice, String icon, T _value,
+  Widget _getListChild(context, String label, T choice, String? icon, T _value,
       Function onTapCallback) {
     return ListTile(
       title: _getMultipleChoiceChildTitle(label, icon),
@@ -105,15 +111,16 @@ class MultipleChoicePref<T> extends Pref<T> {
     );
   }
 
-  Row _getMultipleChoiceChildTitle(String label, String icon) {
+  Row _getMultipleChoiceChildTitle(String label, String? icon) {
     List<Widget> widgets = <Widget>[];
 
-    if (icon != null) {
-      widgets.add(Padding(
-        padding: EdgeInsets.only(right: 14),
-        child: Image.file(Utils.cachedFileImage(icon, null), height: 46),
-      ));
-    }
+    final image = icon != null
+        ? Image.file(Utils.cachedFileImage(icon, null), height: 46)
+        : SizedBox.square(dimension: 1);
+    widgets.add(Padding(
+      padding: EdgeInsets.only(right: 14),
+      child: image,
+    ));
 
     widgets.add(Flexible(child: Text(label)));
 
@@ -122,16 +129,16 @@ class MultipleChoicePref<T> extends Pref<T> {
 
   Future<Widget> showRadioDialog(
       BuildContext context, Function onTapCallback) async {
-    return showDialog(
+    return await showDialog(
         context: context,
         builder: (context) => SimpleDialog(
               title: Text(sprintf(title, [value[key]])),
               children: choices
                   .map((e) => _getRadioChild(
                       context,
-                      e[0],
-                      e[1],
-                      e.length == 3 ? e[2] : null,
+                      e[0] as String,
+                      e[1] as T,
+                      e.length == 3 ? e[2] as String : null,
                       key,
                       value[key],
                       onTapCallback))
@@ -139,22 +146,37 @@ class MultipleChoicePref<T> extends Pref<T> {
             ));
   }
 
-  Future<Widget> showListDialog(
+  Future<dynamic> showListDialog(
       BuildContext context, Function onTapCallback) async {
     return showDialog(
         context: context,
         builder: (context) => SimpleDialog(
               title: Text(sprintf(title, [value[key]])),
               children: choices
-                  .map((e) => _getListChild(context, e[0], e[1],
-                      e.length == 3 ? e[2] : null, value[key], onTapCallback))
+                  .map((e) => _getListChild(
+                      context,
+                      e[0] as String,
+                      e[1] as T,
+                      e.length == 3 ? e[2] as String : null,
+                      value[key],
+                      onTapCallback))
                   .toList(),
             ));
   }
 
   String _getPlural() {
-    var label = choices.singleWhere((l) => l[1] == value[key],
-        orElse: () => choices[0] as List<T>)[0];
+    final List<List<Object?>> typedChoices = (choices as List)
+        .map<List<Object?>>((e) => (e as List).cast<Object?>())
+        .toList();
+
+    final String keyVal = value[key].toString();
+
+    final match = typedChoices.singleWhere((l) => l[1]?.toString() == keyVal,
+        orElse: () => typedChoices.first);
+
+    final String label =
+        (match.isNotEmpty && match[0] != null) ? match[0]!.toString() : '';
+
     final String def = sprintf(description[0], [label]);
 
     if (value[key] is int && description.length > 1) {

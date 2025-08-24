@@ -12,23 +12,26 @@ class Reusable {
   }
 
   static showSnackBar(BuildContext context, String text,
-      {duration: 1400, String actionText, Function actionCallback}) {
+      {duration = 1400, required String actionText, required VoidCallback actionCallback}) {
     Future.delayed(Duration.zero, () {
       var snackBarAction;
-      if (actionText != null && actionCallback != null) {
-        snackBarAction = SnackBarAction(
-            label: actionText,
-            onPressed: () {
-              actionCallback();
-            });
-      }
-
+      snackBarAction = SnackBarAction(
+          label: actionText,
+          onPressed: () {
+            actionCallback();
+          });
+    
       var snackBar = SnackBar(
           action: snackBarAction,
           duration: Duration(milliseconds: duration),
           content: Text(text),
-          backgroundColor: Theme.of(context).dialogBackgroundColor);
-      Scaffold.of(context).showSnackBar(snackBar);
+          backgroundColor: DialogThemeData().backgroundColor);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final messenger = ScaffoldMessenger.of(context);
+        messenger
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
+      });
     });
   }
 

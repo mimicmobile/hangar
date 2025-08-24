@@ -6,7 +6,7 @@ import 'package:settings/models/preference_data.dart';
 import 'package:settings/reusable.dart';
 
 class PreferenceWidget extends StatefulWidget {
-  const PreferenceWidget({Key key}) : super(key: key);
+  const PreferenceWidget({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => PreferenceWidgetState();
@@ -14,7 +14,7 @@ class PreferenceWidget extends StatefulWidget {
 
 class PreferenceWidgetState<T extends PreferenceWidget> extends State<T>
     implements IPreferenceWidgetView {
-  IPreferenceWidgetPresenter presenter;
+  late IPreferenceWidgetPresenter presenter;
   bool loaded = false;
 
   @override
@@ -48,7 +48,7 @@ class PreferenceWidgetState<T extends PreferenceWidget> extends State<T>
 
   _cardChildren(context, orientation) {
     List<Widget> widgets = <Widget>[];
-    for (PrefSet prefSet in presenter.data.prefSet) {
+    for (PrefSet prefSet in presenter.data?.prefSet ?? []) {
       widgets.add(Card(
           shape: BeveledRectangleBorder(),
           margin: EdgeInsets.only(top: 0, bottom: 20, right: 0, left: 0),

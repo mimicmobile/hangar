@@ -5,14 +5,14 @@ abstract class IHomeView {
 }
 
 abstract class IAppListWidgetView {
-  bool loaded;
+  bool loaded = false;
 
   void refreshState(bool shouldRefreshNotification);
   BuildContext getContext();
 }
 
 abstract class IPreferenceWidgetView {
-  bool loaded;
+  bool loaded = false;
 
   void refreshState(bool shouldRefreshNotification);
 }
