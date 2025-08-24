@@ -17,9 +17,10 @@ android {
         applicationId "ca.mimic.hangar"
         minSdk 24
         compileSdkVersion 36
+        // Necessary due to major changes >30 that severely limit notification customization
         targetSdk 30
         versionCode 34000
-        versionName "3.4.0"
+        versionName "4.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
