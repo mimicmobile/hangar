@@ -35,8 +35,8 @@ class MultipleChoicePref<T> extends Pref<T> {
   final List<List<Object>> choices;
   final bool previewIcon;
 
-  MultipleChoicePref(
-      key, title, description, SharedPreferences sp, def, this.choices,
+  MultipleChoicePref(key, title, description, SharedPreferences sp, def,
+      this.choices,
       {this.previewIcon = false})
       : super(key, title, description, sp, def);
 
@@ -45,7 +45,7 @@ class MultipleChoicePref<T> extends Pref<T> {
       onTap: () => showRadioDialog(context, onTapCallback),
       child: Padding(
           padding:
-              const EdgeInsets.only(right: 12, left: 12, top: 17, bottom: 17),
+          const EdgeInsets.only(right: 12, left: 12, top: 17, bottom: 17),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -63,7 +63,7 @@ class MultipleChoicePref<T> extends Pref<T> {
       final String keyVal = value[key] as String;
 
       final path = typedChoices.singleWhere(
-        (l) => l.length > 2 && l[1].toString() == keyVal,
+            (l) => l.length > 2 && l[1].toString() == keyVal,
         orElse: () => typedChoices.first,
       )[2];
 
@@ -105,7 +105,7 @@ class MultipleChoicePref<T> extends Pref<T> {
     return ListTile(
       title: _getMultipleChoiceChildTitle(label, icon),
       onTap: () {
-        onTapCallback(null, choice);
+        onTapCallback('', choice);
         Navigator.pop(context);
       },
     );
@@ -127,14 +127,16 @@ class MultipleChoicePref<T> extends Pref<T> {
     return Row(children: widgets);
   }
 
-  Future<Widget> showRadioDialog(
-      BuildContext context, Function onTapCallback) async {
+  Future<Widget> showRadioDialog(BuildContext context,
+      Function onTapCallback) async {
     return await showDialog(
         context: context,
-        builder: (context) => SimpleDialog(
+        builder: (context) =>
+            SimpleDialog(
               title: Text(sprintf(title, [value[key]])),
               children: choices
-                  .map((e) => _getRadioChild(
+                  .map((e) =>
+                  _getRadioChild(
                       context,
                       e[0] as String,
                       e[1] as T,
@@ -146,14 +148,16 @@ class MultipleChoicePref<T> extends Pref<T> {
             ));
   }
 
-  Future<dynamic> showListDialog(
-      BuildContext context, Function onTapCallback) async {
+  Future<dynamic> showListDialog(BuildContext context,
+      Function onTapCallback) async {
     return showDialog(
         context: context,
-        builder: (context) => SimpleDialog(
+        builder: (context) =>
+            SimpleDialog(
               title: Text(sprintf(title, [value[key]])),
               children: choices
-                  .map((e) => _getListChild(
+                  .map((e) =>
+                  _getListChild(
                       context,
                       e[0] as String,
                       e[1] as T,
@@ -175,7 +179,7 @@ class MultipleChoicePref<T> extends Pref<T> {
         orElse: () => typedChoices.first);
 
     final String label =
-        (match.isNotEmpty && match[0] != null) ? match[0]!.toString() : '';
+    (match.isNotEmpty && match[0] != null) ? match[0]!.toString() : '';
 
     final String def = sprintf(description[0], [label]);
 
