@@ -7,19 +7,27 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Rect
 import android.os.Build
+import android.util.TypedValue
 import android.widget.RemoteViews
-import androidx.core.app.NotificationCompat
+import androidx.annotation.ColorInt
 import androidx.core.app.NotificationCompat.*
 import androidx.core.content.ContextCompat
 import ca.mimic.hangar.Constants.Companion.EXTRA_PACKAGE_NAME
 import ca.mimic.hangar.Constants.Companion.NOTIFICATION_ID
-import ca.mimic.hangar.Constants.Companion.RECEIVER_APP_LAUNCHED
 import ca.mimic.hangar.Constants.Companion.SWITCH_APP_PACKAGE_NAME
 import kotlin.math.ceil
 import kotlin.math.min
+import androidx.core.graphics.scale
+import ca.mimic.hangar.Constants.Companion.RECEIVER_APP_LAUNCHED
+import java.lang.Float.max
+import kotlin.math.roundToInt
 
 class NotificationShortcuts(private val context: Context) {
     private val root: RemoteViews = RemoteViews(context.packageName, R.layout.notification_no_dividers)
@@ -67,7 +75,7 @@ class NotificationShortcuts(private val context: Context) {
     }
 
     private fun addRows() {
-        for (i in 1..numOfRows) {
+        (1..numOfRows).forEach { _ ->
             rows.add(RemoteViews(context.packageName, R.layout.notification_row_no_dividers))
         }
     }
@@ -109,9 +117,9 @@ class NotificationShortcuts(private val context: Context) {
         val bgColorPref = sharedPreferences.bgColor()
         for (view in views) {
             val colorInt = when (bgColorPref) {
-                Constants.PREF_BACKGROUND_COLOR_DARK -> ContextCompat.getColor(context, R.color.darkBg)
-                Constants.PREF_BACKGROUND_COLOR_BLACK -> ContextCompat.getColor(context, R.color.blackBg)
-                else -> Color.WHITE
+                    Constants.PREF_BACKGROUND_COLOR_DARK  -> notificationDrawerBgColor(context, preferDark = true)
+                    Constants.PREF_BACKGROUND_COLOR_BLACK -> Color.BLACK
+                    else                                  -> notificationDrawerBgColor(context, preferDark = false)
             }
             view.setInt(R.id.notifContainer, "setBackgroundColor", colorInt)
         }
@@ -120,15 +128,18 @@ class NotificationShortcuts(private val context: Context) {
     private fun createNotification() {
         getOrCreateChannel()
 
-        val builder = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("Hangar")
-            .setContentText("Hangar")
+        val builder = Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
+            // .setContentTitle("Hangar")
+            // .setContentText("Hangar")
             .setSmallIcon(R.drawable.notification_small_icon)
-            .setCustomContentView(root)
             .setOngoing(true)
             .setWhen(System.currentTimeMillis())
-            .setPriority(PRIORITY_MAX)
+            .setShowWhen(false)
+            .setSilent(true)
+            .setPriority(PRIORITY_LOW)
+            .setCustomContentView(root)
             .setCustomBigContentView(expanded)
+            // .setStyle(DecoratedCustomViewStyle())
             .setVisibility(VISIBILITY_PUBLIC)
 
         val notification = builder.build()
@@ -166,33 +177,119 @@ class NotificationShortcuts(private val context: Context) {
         val appContainer = RemoteViews(context.packageName, Constants.iconSizeMap[iconSize] ?: error(""))
 
         appContainer.setContentDescription(R.id.imageButton, app.name)
-
-        setIconForApp(app, appContainer, context)
+        val sizePx = Utils.dpToPx(context, 48)      // e.g., 40–48dp collapsed; 48–56dp expanded
+        val bgColor = when (sharedPreferences.bgColor()) {
+            Constants.PREF_BACKGROUND_COLOR_DARK  -> notificationDrawerBgColor(context, preferDark = true)
+            Constants.PREF_BACKGROUND_COLOR_BLACK -> Color.BLACK
+            else                                  -> notificationDrawerBgColor(context, preferDark = false)
+        }
+        setIconForApp(app, appContainer, context, bgColor, sizePx)
         setLaunchIntentForApp(app, appContainer, context)
 
         return appContainer
     }
 
-    private fun setIconForApp(app: App, appContainer: RemoteViews, context: Context) {
-        Utils.loadIcon(context, app.safeCachedFile!!)?.let {
-            val iconSize = Utils.dpToPx(context, 72)
-            appContainer.setImageViewBitmap(
-                R.id.imageButton,
-                Bitmap.createScaledBitmap(it, iconSize, iconSize, true)
-            )
+    @ColorInt
+    fun notificationDrawerBgColor(
+        context: Context,
+        preferDark: Boolean? = null,
+        @ColorInt fallbackLight: Int = 0xFFFFFFFF.toInt(), // white
+        @ColorInt fallbackDark:  Int = 0xFF121212.toInt()  // material dark surface
+    ): Int {
+        val isNight = (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
+                Configuration.UI_MODE_NIGHT_YES
+        val useDark = preferDark ?: isNight
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val resId = if (useDark) android.R.color.system_neutral1_900
+            else          android.R.color.system_neutral1_50
+            try { return ContextCompat.getColor(context, resId) } catch (_: Throwable) { /* fall through */ }
+        }
+
+        val tv = TypedValue()
+        if (context.theme.resolveAttribute(android.R.attr.colorBackground, tv, true)) {
+            if (tv.resourceId != 0) return ContextCompat.getColor(context, tv.resourceId)
+            if (tv.type in TypedValue.TYPE_FIRST_COLOR_INT..TypedValue.TYPE_LAST_COLOR_INT) return tv.data
+        }
+        return if (useDark) fallbackDark else fallbackLight
+    }
+
+    /**
+     * Fit-centers the raw icon into sizePx x sizePx, NO padding/shape.
+     * Fills the canvas with bgColor, then draws the icon, then returns RGB_565.
+     */
+    fun buildNotifIconRawOnBg565(
+        src: Bitmap,
+        sizePx: Int,
+        @ColorInt bgColor: Int,
+        upscale: Boolean = true
+    ): Bitmap {
+        // Composite on ARGB to avoid halos, then convert to 565
+        val outArgb = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(outArgb)
+
+        // Solid background (square)
+        val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = bgColor }
+        canvas.drawRect(0f, 0f, sizePx.toFloat(), sizePx.toFloat(), bgPaint)
+
+        // Fit-center scale
+        var scale = minOf(sizePx.toFloat() / src.width, sizePx.toFloat() / src.height)
+        if (!upscale) scale = minOf(1f, scale)
+
+        val dstW = max(1f, src.width * scale).roundToInt()
+        val dstH = max(1f, src.height * scale).roundToInt()
+        val left = (sizePx - dstW) / 2
+        val top  = (sizePx - dstH) / 2
+
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            isFilterBitmap = true
+            isDither = true
+        }
+        canvas.drawBitmap(src, null, Rect(left, top, left + dstW, top + dstH), paint)
+
+        return outArgb.copy(Bitmap.Config.RGB_565, false)
+    }
+
+    private fun setIconForApp(app: App, appContainer: RemoteViews, context: Context, bgColor: Int, sizePx: Int) {
+        Utils.loadIcon(context, app.safeCachedFile!!)?.let { src ->
+            val bmp = buildNotifIconRawOnBg565(src, sizePx, bgColor, upscale = true)
+            appContainer.setImageViewBitmap(R.id.imageButton, bmp)
         }
     }
 
+    private fun safeScaledNotificationBitmap(src: Bitmap, sizePx: Int): Bitmap {
+        val scaled = if (src.width != sizePx || src.height != sizePx) {
+            src.scale(sizePx, sizePx)
+        } else src
+        // Use RGB_565 to halve memory; immutable copy
+        return if (scaled.config != Bitmap.Config.RGB_565) {
+            scaled.copy(Bitmap.Config.RGB_565, false)
+        } else scaled
+    }
+
     private fun setLaunchIntentForApp(app: App, appContainer: RemoteViews, context: Context) {
-        val intent = Intent(context, HangarReceiver::class.java)
-            .putExtra(EXTRA_PACKAGE_NAME, app.packageName)
-            .setAction(RECEIVER_APP_LAUNCHED)
+        var pi: PendingIntent?
+        if (app.packageName == SWITCH_APP_PACKAGE_NAME) {
+            val intent = Intent(context, HangarReceiver::class.java)
+                .putExtra(EXTRA_PACKAGE_NAME, app.packageName)
+                .setAction(RECEIVER_APP_LAUNCHED)
 
-        val activity = PendingIntent.getBroadcast(
-            context, Utils.getRandomNumber(1000), intent,
-            PendingIntent.FLAG_CANCEL_CURRENT
-        )
+            pi = PendingIntent.getBroadcast(
+                context, Utils.getRandomNumber(1000), intent,
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        } else {
+            val tramp = Intent(context, TrampolineActivity::class.java)
+                .putExtra(EXTRA_PACKAGE_NAME, app.packageName)
 
-        appContainer.setOnClickPendingIntent(R.id.imageCont, activity)
+            pi = PendingIntent.getActivity(
+                context,
+                app.packageName.hashCode(),
+                tramp,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
+
+        appContainer.setOnClickPendingIntent(R.id.imageCont, pi)
     }
 }

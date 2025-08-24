@@ -39,15 +39,15 @@ class _HomeState extends State<Home> implements IHomeView {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.list),
-            title: Text('Apps'),
+            label: 'Apps',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.photo),
-            title: Text('Appearance'),
+            label: 'Appearance',
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.accessibility),
-              title: Text('Behavior')
+              label: 'Behavior'
           )
         ],
       ),

@@ -27,6 +27,8 @@ import java.io.FileOutputStream
 import java.util.ArrayList
 import java.util.HashMap
 import java.util.Random
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
 
 /**
  * Inspired from http://stackoverflow.com/questions/31490630/how-to-load-icon-from-icon-pack
@@ -241,23 +243,19 @@ class IconsHandler(val context: Context) {
         val h = backImage.height
 
         // create a bitmap for the result
-        val result = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val result = createBitmap(w, h)
         val canvas = Canvas(result)
 
         // draw the background first
         canvas.drawBitmap(backImage, 0f, 0f, null)
 
         // scale original icon
-        val scaledBitmap = Bitmap.createScaledBitmap(
-            (defaultDrawable.toBitmap()),
-            (w * factor).toInt(),
-            (h * factor).toInt(),
-            false
-        )
+        val scaledBitmap =
+            (defaultDrawable.toBitmap()).scale((w * factor).toInt(), (h * factor).toInt(), false)
 
         if (maskImage != null) {
             // draw the scaled bitmap with mask
-            val mutableMask = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+            val mutableMask = createBitmap(w, h)
             val maskCanvas = Canvas(mutableMask)
             maskCanvas.drawBitmap(maskImage!!, 0f, 0f, Paint())
 

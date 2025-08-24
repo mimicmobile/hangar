@@ -1,4 +1,22 @@
-include ':app'
+pluginManagement {
+    repositories { google(); mavenCentral(); gradlePluginPortal() }
+    plugins {
+        id "com.android.application" version '8.12.1'
+        id "com.android.library"     version '8.12.1'
+        id "org.jetbrains.kotlin.android" version "1.9.24"
+    }
+}
 
-setBinding(new Binding([gradle: this]))
-evaluate(new File('app/settings/.android/include_flutter.groovy'))
+dependencyResolutionManagement {
+    repositoriesMode = RepositoriesMode.PREFER_SETTINGS
+    repositories {
+        google()
+        mavenCentral()
+        maven { url = uri("app/settings/build/host/outputs/repo") } // for your Flutter AARs
+        maven { url = uri("https://storage.googleapis.com/download.flutter.io") }
+    }
+}
+
+rootProject.name = "Hangar"
+include(":app")
+project(":app").projectDir = file("app")

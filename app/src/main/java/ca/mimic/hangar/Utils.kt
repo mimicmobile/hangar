@@ -8,6 +8,7 @@ import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Context.JOB_SCHEDULER_SERVICE
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -15,14 +16,16 @@ import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.hardware.display.DisplayManager
+import android.os.Build
 import android.os.Process
 import android.util.Log
 import android.util.TypedValue
 import android.view.Display
 import androidx.core.app.AppOpsManagerCompat.MODE_ALLOWED
 import java.io.*
-import java.lang.NullPointerException
 import java.util.*
+import java.util.concurrent.TimeUnit
+import androidx.core.graphics.createBitmap
 
 class Utils {
     companion object {
@@ -30,27 +33,61 @@ class Utils {
             Log.d("Hangar", s)
         }
 
+        private fun visibleLauncherPackages(context: Context): Set<String> {
+            val pm = context.packageManager
+            val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+
+            val resolves = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                pm.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0))
+            } else {
+                @Suppress("DEPRECATION")
+                pm.queryIntentActivities(intent, 0)
+            }
+            return resolves.map { it.activityInfo.packageName }.toSet()
+        }
+
+        private fun getApplicationInfoCompat(pm: PackageManager, pkg: String): ApplicationInfo? {
+            return try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    pm.getApplicationInfo(pkg, PackageManager.ApplicationInfoFlags.of(0))
+                } else {
+                    @Suppress("DEPRECATION")
+                    pm.getApplicationInfo(pkg, 0)
+                }
+            } catch (_: PackageManager.NameNotFoundException) {
+                null
+            }
+        }
+
         fun getUsageStats(context: Context, forceModified: Boolean = false): Boolean {
             if (!isScreenOn(context)) return false
 
-            val stats = getUsageStatsManager(context).queryAndAggregateUsageStats(
-                getBeginTimeMillis(),
-                System.currentTimeMillis()
-            ).toList()
+            val end = System.currentTimeMillis()
+            val begin = end - TimeUnit.DAYS.toMillis(7)  // tighter window keeps results relevant
+
+            val usage = getUsageStatsManager(context)
+                .queryAndAggregateUsageStats(begin, end)
+                .toList()
 
             val appStorage = AppStorage(context, forceModified)
+            val visible = visibleLauncherPackages(context)
 
-            stats.filter {
-                it.second.lastTimeUsed > 100000 &&
-                        it.second.totalTimeInForeground > 0 &&
-                        !Constants.IGNORED_PACKAGES.contains(it.second.packageName) &&
-                        !appStorage.launchers.contains(it.second.packageName)
-            }
-                .forEach { usageStats ->
+            log("usage.size=${usage.size} visible.launcher=${visible.size}")
+
+            usage.asSequence()
+                .map { it.second } // UsageStats
+                .filter { us ->
+                    us.lastTimeUsed > 100_000 &&
+                            us.totalTimeInForeground > 0 &&
+                            !Constants.IGNORED_PACKAGES.contains(us.packageName) &&
+                            !appStorage.launchers.contains(us.packageName) &&
+                            visible.contains(us.packageName)
+                }
+                .forEach { us ->
                     appStorage.checkApp(
-                        usageStats.second.packageName,
-                        lastTimeUsed = usageStats.second.lastTimeUsed,
-                        totalTimeInForeground = usageStats.second.totalTimeInForeground
+                        us.packageName,
+                        lastTimeUsed = us.lastTimeUsed,
+                        totalTimeInForeground = us.totalTimeInForeground
                     )
                 }
 
@@ -86,7 +123,7 @@ class Utils {
         }
 
         fun isApi22(): Boolean {
-            return android.os.Build.VERSION.SDK_INT >= 22
+            return Build.VERSION.SDK_INT >= 22
         }
 
         fun drawableToBitmap(drawable: Drawable): Bitmap {
@@ -94,7 +131,7 @@ class Utils {
                 return drawable.bitmap
             }
 
-            val bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+            val bitmap = createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight)
             val canvas = Canvas(bitmap)
             drawable.setBounds(0, 0, canvas.width, canvas.height)
             drawable.draw(canvas)
@@ -171,14 +208,9 @@ class Utils {
         }
 
         fun getLaunchIntent(context: Context, packageName: String): Intent? {
-            var intent: Intent? = null
-            try {
-                intent = context.packageManager.getLaunchIntentForPackage(packageName)
-                intent.addCategory(Intent.CATEGORY_LAUNCHER)
-                intent.action = Intent.ACTION_MAIN
-            } catch (e: PackageManager.NameNotFoundException) {
-            } catch (e: NullPointerException) {
-            }
+            val intent = context.packageManager.getLaunchIntentForPackage(packageName)
+            intent?.addCategory(Intent.CATEGORY_LAUNCHER)
+            intent?.action = Intent.ACTION_MAIN
             return intent
         }
 

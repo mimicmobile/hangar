@@ -1,74 +1,97 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
+plugins {
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
+    id "com.google.devtools.ksp"
+}
 
 def keystorePropertiesFile = rootProject.file("key.properties")
 def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
 
 android {
-    signingConfigs {
-        release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-        }
-    }
-    compileSdkVersion 28
+    namespace "ca.mimic.hangar"
+    compileSdk 35
+
     defaultConfig {
         applicationId "ca.mimic.hangar"
-        minSdkVersion 21
-        targetSdkVersion 28
+        minSdk 21
+        targetSdk 30
         versionCode 34000
         versionName "3.4.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                keyAlias keystoreProperties["keyAlias"]
+                keyPassword keystoreProperties["keyPassword"]
+                storeFile file(keystoreProperties["storeFile"])
+                storePassword keystoreProperties["storePassword"]
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
         }
         debug {
             signingConfig signingConfigs.release
         }
     }
+
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
-    lintOptions {
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    lint {
         abortOnError false
     }
-    packagingOptions {
-        pickFirst 'lib/armeabi-v7a/libapp.so'
-        pickFirst 'lib/arm64-v8a/libapp.so'
-        pickFirst 'lib/x86/libapp.so'
-        pickFirst 'lib/x86_64/libapp.so'
+    packaging {
+        jniLibs {
+            pickFirsts += [
+                    "lib/armeabi-v7a/libapp.so",
+                    "lib/arm64-v8a/libapp.so",
+                    "lib/x86/libapp.so",
+                    "lib/x86_64/libapp.so"
+            ]
+        }
     }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0-beta01'
-    implementation 'androidx.core:core-ktx:1.2.0-alpha01'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'com.google.android.material:material:1.1.0-alpha07'
+    implementation fileTree(dir: "libs", include: ["*.jar"])
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.1'
+    // keep your old AndroidX versions if you want minimal churn
+    implementation "androidx.appcompat:appcompat:1.1.0-beta01"
+    implementation "androidx.core:core-ktx:1.2.0-alpha01"
+    implementation "androidx.constraintlayout:constraintlayout:1.1.3"
+    implementation "com.google.android.material:material:1.1.0-alpha07"
 
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    // bump coroutines to work well with modern Kotlin
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1"
 
-    implementation 'com.squareup.moshi:moshi:1.6.0'
-    implementation 'com.squareup.moshi:moshi-kotlin:1.6.0'
-    implementation 'com.squareup.moshi:moshi-adapters:1.6.0'
-    kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.6.0'
+    // bump Moshi and use KSP codegen
+    implementation "com.squareup.moshi:moshi:1.15.2"
+    implementation "com.squareup.moshi:moshi-kotlin:1.15.2"
+    ksp "com.squareup.moshi:moshi-kotlin-codegen:1.15.2"
 
-    implementation project(':flutter')
+    testImplementation "junit:junit:4.13.2"
+    androidTestImplementation "androidx.test:runner:1.2.0"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.2.0"
+
+    // Flutter AARs (from your local repo)
+    debugImplementation   "com.example.settings:flutter_debug:1.0"
+    releaseImplementation "com.example.settings:flutter_release:1.0"
 }
+
