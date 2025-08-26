@@ -4,7 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 
 class SharedPrefsHelper(val context: Context) {
-    private val sharedPreferences: SharedPreferences = context.getSharedPreferences(Constants.PREFS_FILE, 0)
+    private val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences(Constants.PREFS_FILE, 0)
 
     fun maxAppsPerRow() = sharedPreferences
         .getLong(Constants.PREF_APPS_PER_ROW, Constants.DEFAULT_APPS_PER_ROW).toInt()

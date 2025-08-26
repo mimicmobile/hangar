@@ -8,6 +8,7 @@ abstract class IAppListWidgetView {
   bool loaded = false;
 
   void refreshState(bool shouldRefreshNotification);
+
   BuildContext getContext();
 }
 

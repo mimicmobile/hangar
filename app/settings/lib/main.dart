@@ -54,9 +54,12 @@ ThemeData buildDarkTheme() {
       contentTextStyle: const TextStyle(color: Colors.white),
       actionTextColor: scheme.secondary,
     ),
-    textTheme: ThemeData.dark().textTheme.apply(
-          bodyColor: Colors.white,
-          displayColor: Colors.white,
-        ),
+    textTheme: ThemeData
+        .dark()
+        .textTheme
+        .apply(
+      bodyColor: Colors.white,
+      displayColor: Colors.white,
+    ),
   );
 }

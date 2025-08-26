@@ -16,19 +16,15 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.UserHandle
+import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.scale
 import ca.mimic.hangar.Utils.Companion.log
-
 import org.xmlpull.v1.XmlPullParser
-
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.util.ArrayList
-import java.util.HashMap
 import java.util.Random
-import androidx.core.graphics.createBitmap
-import androidx.core.graphics.scale
 
 /**
  * Inspired from http://stackoverflow.com/questions/31490630/how-to-load-icon-from-icon-pack
@@ -37,16 +33,22 @@ import androidx.core.graphics.scale
 class IconsHandler(val context: Context) {
     // map with available drawable for an icons pack
     private val packagesDrawables = HashMap<String, String>()
+
     // instance of a resource object of an icon pack
     private lateinit var iconPackRes: Resources
+
     // package name of the icons pack
     private lateinit var iconsPackPackageName: String
+
     // list of back images available on an icons pack
     private val backImages = ArrayList<Bitmap>()
+
     // bitmap mask of an icons pack
     private var maskImage: Bitmap? = null
+
     // front image of an icons pack
     private var frontImage: Bitmap? = null
+
     // scale factor of an icons pack
     private var factor = 1.0f
     private val pm: PackageManager = context.packageManager
@@ -138,7 +140,7 @@ class IconsHandler(val context: Context) {
                 }
             }
         } catch (e: Exception) {
-            log( "Error parsing appfilter.xml $e")
+            log("Error parsing appfilter.xml $e")
         }
 
     }
@@ -157,7 +159,8 @@ class IconsHandler(val context: Context) {
     fun generateBitmapFromIconPack(packageName: String, iconPack: String): String? {
         Utils.getLaunchIntent(context, packageName)?.component?.let {
             val filename = getGeneratedIconFilename(packageName)
-            val bitmapData = getBitmapForPackage(filename, it, android.os.Process.myUserHandle(), iconPack)
+            val bitmapData =
+                getBitmapForPackage(filename, it, android.os.Process.myUserHandle(), iconPack)
             cacheStoreBitmap(filename, bitmapData["bitmap"] as Bitmap?)
             return filename
         }
@@ -168,7 +171,10 @@ class IconsHandler(val context: Context) {
         return "${packageName}_generated"
     }
 
-    private fun getDefaultAppDrawable(componentName: ComponentName, userHandle: UserHandle): Drawable? {
+    private fun getDefaultAppDrawable(
+        componentName: ComponentName,
+        userHandle: UserHandle
+    ): Drawable? {
         return try {
             val launcher = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
             val info = launcher.getActivityList(componentName.packageName, userHandle)[0]
@@ -187,7 +193,12 @@ class IconsHandler(val context: Context) {
     /**
      * Get or generate icon for an app
      */
-    fun getBitmapForPackage(filename: String, componentName: ComponentName, userHandle: UserHandle, iconPack: String? = null): Map<String, Any?> {
+    fun getBitmapForPackage(
+        filename: String,
+        componentName: ComponentName,
+        userHandle: UserHandle,
+        iconPack: String? = null
+    ): Map<String, Any?> {
         // Search first in cache
         val systemBitmap = cacheGetBitmap(filename)
         if (systemBitmap != null) {
@@ -204,10 +215,14 @@ class IconsHandler(val context: Context) {
 
         val drawable = packagesDrawables[componentName.toString()]
         if (drawable != null) { // there is a custom icon
-            val id = iconPackRes.getIdentifier(drawable, "drawable", (iconPack ?: iconsPackPackageName))
+            val id =
+                iconPackRes.getIdentifier(drawable, "drawable", (iconPack ?: iconsPackPackageName))
             if (id > 0) {
                 try {
-                    return mapOf("customIcon" to true, "bitmap" to iconPackRes.getDrawable(id, null).toBitmap())
+                    return mapOf(
+                        "customIcon" to true,
+                        "bitmap" to iconPackRes.getDrawable(id, null).toBitmap()
+                    )
                 } catch (e: Resources.NotFoundException) {
                     // Unable to load icon, keep going.
                     e.printStackTrace()

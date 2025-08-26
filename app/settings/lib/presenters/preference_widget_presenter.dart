@@ -41,5 +41,5 @@ class PreferenceWidgetPresenter implements IPreferenceWidgetPresenter {
 
       _view.refreshState(notificationRefresh);
     });
-    }
+  }
 }

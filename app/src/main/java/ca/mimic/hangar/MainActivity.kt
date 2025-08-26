@@ -25,7 +25,10 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 private const val REQ_POST_NOTIFS = 1001
 
@@ -54,14 +57,17 @@ class MainActivity : FlutterActivity() {
                     refreshNotifications()
                     result.success(null)
                 }
+
                 ICON_PACK_REBUILD_MESSAGE -> {
                     rebuildIconPacks()
                     result.success(null)
                 }
+
                 ICON_PACK_LIST_MESSAGE -> {
                     val iconPackJson = getIconPacksJson(packageName)
                     result.success(iconPackJson)
                 }
+
                 CHANGE_ICON_MESSAGE -> {
                     selectedAppPackageName = packageName!!
                     if (launchPackageName == "default") {
@@ -71,6 +77,7 @@ class MainActivity : FlutterActivity() {
                     }
                     result.success(null)
                 }
+
                 else -> result.notImplemented()
             }
         }

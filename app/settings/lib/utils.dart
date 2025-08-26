@@ -8,7 +8,6 @@ class Utils {
   static String _cacheFileName(String path, String? packageName) {
     if (packageName == null) {
       return path;
-
     }
     return join(path, '$packageName.png');
   }

@@ -14,7 +14,8 @@ class AppListWidget extends StatefulWidget {
 }
 
 class _AppListWidgetState extends State<AppListWidget>
-    with WidgetsBindingObserver implements IAppListWidgetView {
+    with WidgetsBindingObserver
+    implements IAppListWidgetView {
   late IAppListWidgetPresenter _presenter;
   bool loaded = false;
   late BuildContext _buildContext;
@@ -68,35 +69,35 @@ class _AppListWidgetState extends State<AppListWidget>
           child: SizedBox.expand(
             child: _presenter.appData.emptyList()
                 ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            top: 8.0, left: 8.0, bottom: 20.0, right: 8.0),
-                        child: Text("App list is being built..",
-                            style: TextStyle(
-                                fontSize: 20.0, color: Colors.grey[300])),
-                      ),
-                      MaterialButton(
-                          color: Config.accentColor,
-                          elevation: 2,
-                          onPressed: _presenter.refreshApps,
-                          child: Text("Refresh",
-                              style: TextStyle(
-                                  fontSize: 20.0, color: Colors.white))),
-                    ],
-                  )
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 8.0, left: 8.0, bottom: 20.0, right: 8.0),
+                  child: Text("App list is being built..",
+                      style: TextStyle(
+                          fontSize: 20.0, color: Colors.grey[300])),
+                ),
+                MaterialButton(
+                    color: Config.accentColor,
+                    elevation: 2,
+                    onPressed: _presenter.refreshApps,
+                    child: Text("Refresh",
+                        style: TextStyle(
+                            fontSize: 20.0, color: Colors.white))),
+              ],
+            )
                 : ListView.separated(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: _presenter.appData.apps.length,
-                    itemBuilder: (context, index) {
-                      return _presenter.appData.rowWidget(
-                          context, orientation, index,
-                          onTapCallback: _presenter.appTap);
-                    },
-                    separatorBuilder: (BuildContext context, int index) =>
-                        Divider(color: Config.lightBgColor, height: 1)),
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: _presenter.appData.apps.length,
+                itemBuilder: (context, index) {
+                  return _presenter.appData.rowWidget(
+                      context, orientation, index,
+                      onTapCallback: _presenter.appTap);
+                },
+                separatorBuilder: (BuildContext context, int index) =>
+                    Divider(color: Config.lightBgColor, height: 1)),
           ),
           onRefresh: _presenter.refreshApps);
     } else {

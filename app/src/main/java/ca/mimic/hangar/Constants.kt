@@ -16,6 +16,7 @@ class Constants {
         const val RECEIVER_APP_LAUNCHED = "ca.mimic.hangar.APP_LAUNCHED"
         const val RECEIVER_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED"
         const val ACTION_ADW_PICK_ICON = "org.adw.launcher.icons.ACTION_PICK_ICON"
+
         // Prefs
         const val PREFS_FILE: String = "FlutterSharedPreferences"
         const val PREF_APP_LIST: String = "flutter.apps"

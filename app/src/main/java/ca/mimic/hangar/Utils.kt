@@ -22,10 +22,16 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.Display
 import androidx.core.app.AppOpsManagerCompat.MODE_ALLOWED
-import java.io.*
-import java.util.*
-import java.util.concurrent.TimeUnit
 import androidx.core.graphics.createBitmap
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.Calendar
+import java.util.Random
+import java.util.concurrent.TimeUnit
 
 class Utils {
     companion object {
@@ -113,7 +119,8 @@ class Utils {
         fun checkForUsagePermission(context: Context): Boolean {
             val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
             appOps.apply {}
-            val mode = appOps.checkOpNoThrow(OPSTR_GET_USAGE_STATS, Process.myUid(), context.packageName)
+            val mode =
+                appOps.checkOpNoThrow(OPSTR_GET_USAGE_STATS, Process.myUid(), context.packageName)
             return mode == MODE_ALLOWED
         }
 
@@ -146,7 +153,8 @@ class Utils {
                 val bitmap = drawableToBitmap(icon)
 
                 try {
-                    resourceFile = FileOutputStream("${context.cacheDir}${File.separator}$packageName.png")
+                    resourceFile =
+                        FileOutputStream("${context.cacheDir}${File.separator}$packageName.png")
                     bitmap.compress(Bitmap.CompressFormat.PNG, 90, resourceFile)
 
                     resourceFile.flush()
@@ -174,9 +182,11 @@ class Utils {
             var resourceFile: FileInputStream? = null
             try {
                 if (packageName == Constants.SWITCH_APP_PACKAGE_NAME) {
-                    icon = BitmapFactory.decodeResource(context.resources, R.drawable.ic_switch_page)
+                    icon =
+                        BitmapFactory.decodeResource(context.resources, R.drawable.ic_switch_page)
                 } else {
-                    resourceFile = FileInputStream("${context.cacheDir}${File.separator}$packageName.png")
+                    resourceFile =
+                        FileInputStream("${context.cacheDir}${File.separator}$packageName.png")
                     val buffer = ByteArray(1024)
                     val bytes = ByteArrayOutputStream()
                     var bytesRead = 0

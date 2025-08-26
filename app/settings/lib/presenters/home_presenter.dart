@@ -6,6 +6,7 @@ class HomePresenter implements IHomePresenter {
   IHomeView _view;
 
   HomePresenter(this._view);
+
   int currentIndex = 0;
 
   late List<Widget> pages;

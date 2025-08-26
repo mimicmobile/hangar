@@ -35,6 +35,7 @@ class HangarReceiver : BroadcastReceiver() {
                 }
 
             }
+
             RECEIVER_BOOT_COMPLETED -> {
                 Utils.getUsageStats(context)
             }

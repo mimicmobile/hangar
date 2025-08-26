@@ -1,15 +1,14 @@
 package ca.mimic.hangar
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import ca.mimic.hangar.Utils.Companion.log
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import java.util.ArrayList
-import android.content.Intent
-import android.graphics.Bitmap
-import ca.mimic.hangar.Utils.Companion.log
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlin.math.min
 
@@ -56,10 +55,14 @@ class AppStorage(private val context: Context, private var appListModified: Bool
         return adapter.toJson(iconPack.getPackageList())
     }
 
-    class IconPackParser(private val appStorage: AppStorage, private val defaultPackageName: String) {
+    class IconPackParser(
+        private val appStorage: AppStorage,
+        private val defaultPackageName: String
+    ) {
         private val context: Context = appStorage.iconsHandler.context
         private val packsList: MutableList<App> = mutableListOf()
-        private val iconFilename = appStorage.iconsHandler.getGeneratedIconFilename(defaultPackageName)
+        private val iconFilename =
+            appStorage.iconsHandler.getGeneratedIconFilename(defaultPackageName)
         private val hasDefaultGeneratedIcon = Utils.iconExists(context, iconFilename)
 
         init {
@@ -158,8 +161,10 @@ class AppStorage(private val context: Context, private var appListModified: Bool
     private fun generateIcon(packageName: String, app: App) {
         Utils.getLaunchIntent(context, packageName)?.component?.let {
             val filename = "${packageName}_${System.currentTimeMillis()}"
-            val bitmapData = iconsHandler.getBitmapForPackage(filename, it, android.os.Process.myUserHandle())
-            val cachedIcon = iconsHandler.cacheStoreBitmap(filename, bitmapData["bitmap"] as Bitmap?)
+            val bitmapData =
+                iconsHandler.getBitmapForPackage(filename, it, android.os.Process.myUserHandle())
+            val cachedIcon =
+                iconsHandler.cacheStoreBitmap(filename, bitmapData["bitmap"] as Bitmap?)
             val customIcon = bitmapData["customIcon"] as Boolean?
 
             if (customIcon != null) {
@@ -236,7 +241,8 @@ class AppStorage(private val context: Context, private var appListModified: Bool
     }
 
     private fun getSortedApps(): MutableList<App> {
-        val sortedList = apps.filter { !it.pinned }.sortedByDescending { it.sortScore }.toMutableList()
+        val sortedList =
+            apps.filter { !it.pinned }.sortedByDescending { it.sortScore }.toMutableList()
         val pinned = apps.filter { it.pinned }.sortedByDescending { it.sortScore }
 
         val fullPageCount = sharedPreferences.appsPerPage() - pinned.size

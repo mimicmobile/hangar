@@ -14,7 +14,8 @@ class TrampolineActivity : Activity() {
         super.onCreate(savedInstanceState)
         context = this
 
-        val packageName: String = intent.getStringExtra(EXTRA_PACKAGE_NAME) ?: run { finish(); return }
+        val packageName: String =
+            intent.getStringExtra(EXTRA_PACKAGE_NAME) ?: run { finish(); return }
 
         if (packageName == Constants.SWITCH_APP_PACKAGE_NAME) {
             val page = incrementPageNumber(sharedPreferences)
@@ -23,7 +24,7 @@ class TrampolineActivity : Activity() {
             AppStorage(context).launchApp(packageName)
             sharedPreferences.setPage(1)
         }
-        finish()
+        finishAndRemoveTask()
     }
 
     companion object {

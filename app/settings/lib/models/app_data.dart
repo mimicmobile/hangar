@@ -44,14 +44,16 @@ class AppData {
 
   void _sortApps(List<App> jApps) {
     jApps.sort(
-        (a, b) => b.totalTimeInForeground.compareTo(a.totalTimeInForeground));
+            (a, b) =>
+            b.totalTimeInForeground.compareTo(a.totalTimeInForeground));
 
     // Remove pinned from main list
     List<App> pinned = jApps.where((a) => a.pinned == true).toList();
     jApps.removeWhere((a) => a.pinned == true);
 
     // Combine lists
-    apps = List.of(pinned)..addAll(jApps);
+    apps = List.of(pinned)
+      ..addAll(jApps);
   }
 
   String _toJson(List<App> apps) {
@@ -62,7 +64,8 @@ class AppData {
     return apps.isEmpty;
   }
 
-  Widget rowWidget(context, orientation, index, {required Function onTapCallback}) {
+  Widget rowWidget(context, orientation, index,
+      {required Function onTapCallback}) {
     return apps[index]
         .rowWidget(context, cachePath, onTapCallback: onTapCallback);
   }

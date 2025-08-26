@@ -7,7 +7,7 @@ class Reusable {
   static loadingProgress(orientation) {
     return Padding(
         padding:
-            EdgeInsets.only(top: 100.0, right: 20.0, left: 20.0, bottom: 40.0),
+        EdgeInsets.only(top: 100.0, right: 20.0, left: 20.0, bottom: 40.0),
         child: Center(child: CircularProgressIndicator()));
   }
 
@@ -20,7 +20,7 @@ class Reusable {
           onPressed: () {
             actionCallback();
           });
-    
+
       var snackBar = SnackBar(
           action: snackBarAction,
           duration: Duration(milliseconds: duration),
@@ -50,9 +50,10 @@ class Reusable {
         'icon_pack_list', <String, String>{"packageName": packageName});
     return AppData()
         .getThemesFromJson(s)
-        .expand((e) => [
-              [e.name, e.packageName, e.cachedFile]
-            ])
+        .expand((e) =>
+    [
+      [e.name, e.packageName, e.cachedFile]
+    ])
         .toList();
   }
 

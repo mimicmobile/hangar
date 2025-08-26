@@ -15,7 +15,8 @@ class PrefSet {
 
   PrefSet(this.title, this.prefs);
 
-  Widget rowWidget(context, orientation, index, {required Function onTapCallback}) {
+  Widget rowWidget(context, orientation, index,
+      {required Function onTapCallback}) {
     return prefs[index].rowWidget(context, onTapCallback: onTapCallback);
   }
 }

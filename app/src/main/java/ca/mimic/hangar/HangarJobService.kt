@@ -36,7 +36,8 @@ class HangarJobService : JobService() {
         }
 
         jobFinished(jp, false)
-        startJob(this, JOB_ID,
+        startJob(
+            this, JOB_ID,
             sharedPreferences.jobInterval(),
             this::class.java
         )

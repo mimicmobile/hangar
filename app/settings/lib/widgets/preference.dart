@@ -55,7 +55,7 @@ class PreferenceWidgetState<T extends PreferenceWidget> extends State<T>
           child: Stack(children: [
             Container(
                 padding:
-                    EdgeInsets.only(top: 16, bottom: 16, left: 12, right: 12),
+                EdgeInsets.only(top: 16, bottom: 16, left: 12, right: 12),
                 child: Text(prefSet.title,
                     style: TextStyle(
                         color: Config.accentColor,

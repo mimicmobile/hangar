@@ -1,5 +1,5 @@
-import 'package:settings/interfaces/views.dart';
 import 'package:flutter/material.dart';
+import 'package:settings/interfaces/views.dart';
 import 'package:settings/presenters/home_presenter.dart';
 import 'package:settings/widgets/app_list.dart';
 import 'package:settings/widgets/appearance.dart';

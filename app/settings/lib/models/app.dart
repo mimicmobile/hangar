@@ -23,8 +23,7 @@ class App {
 
   late String totalTimeReadable;
 
-  App(
-      this.name,
+  App(this.name,
       this.packageName,
       this.cachedIcon,
       this.isSystemApp,
@@ -55,7 +54,7 @@ class App {
         customIcon = json['customIcon'] ?? false,
         cachedFile = json['cachedFile'],
         totalTimeReadable =
-            calculateTotalTimeReadable(json['totalTimeInForeground']);
+        calculateTotalTimeReadable(json['totalTimeInForeground']);
 
   static String calculateTotalTimeReadable(int totalTimeInForeground) {
     var duration = Duration(seconds: (totalTimeInForeground / 1000).round());
@@ -69,26 +68,27 @@ class App {
       child: PopupMenuButton(
         offset: Offset(1, 0),
         onSelected: (s) => onTapCallback(packageName, s),
-        itemBuilder: (_) => <PopupMenuItem<String>>[
-              PopupMenuItem<String>(
-                  value: "blacklist",
-                  child: Text(
-                      blacklisted
-                          ? "Remove app from blacklist"
-                          : "Blacklist app",
-                      style:
-                          TextStyle(fontSize: 12.0, color: Colors.grey[200]))),
-              PopupMenuItem<String>(
-                  value: "pin",
-                  child: Text(pinned ? "Remove pin from app" : "Pin app",
-                      style:
-                          TextStyle(fontSize: 12.0, color: Colors.grey[200]))),
+        itemBuilder: (_) =>
+        <PopupMenuItem<String>>[
+          PopupMenuItem<String>(
+              value: "blacklist",
+              child: Text(
+                  blacklisted
+                      ? "Remove app from blacklist"
+                      : "Blacklist app",
+                  style:
+                  TextStyle(fontSize: 12.0, color: Colors.grey[200]))),
+          PopupMenuItem<String>(
+              value: "pin",
+              child: Text(pinned ? "Remove pin from app" : "Pin app",
+                  style:
+                  TextStyle(fontSize: 12.0, color: Colors.grey[200]))),
           PopupMenuItem<String>(
               value: "change_icon",
               child: Text("Change icon",
                   style:
                   TextStyle(fontSize: 12.0, color: Colors.grey[200]))),
-            ],
+        ],
         child: Row(
           children: <Widget>[
             Flexible(
@@ -134,10 +134,11 @@ class App {
         fontSize: 18.0,
         color: blacklisted ? Colors.grey[600] : Colors.white,
         decoration:
-            TextDecoration.combine(<TextDecoration>[]..addAll(decorations)));
+        TextDecoration.combine(<TextDecoration>[]..addAll(decorations)));
   }
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() =>
+      {
         'name': name,
         'packageName': packageName,
         'cachedIcon': cachedIcon,
