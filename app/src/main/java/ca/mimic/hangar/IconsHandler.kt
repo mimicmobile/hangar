@@ -1,5 +1,6 @@
 package ca.mimic.hangar
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.LauncherApps
@@ -16,6 +17,7 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.UserHandle
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.scale
@@ -63,6 +65,7 @@ class IconsHandler(val context: Context) {
     /**
      * Load configured icons pack
      */
+    @SuppressLint("DiscouragedApi")
     fun loadIconsPack() {
         //clear icons pack
         iconsPackPackageName = SharedPrefsHelper(context).iconPack()
@@ -145,10 +148,11 @@ class IconsHandler(val context: Context) {
 
     }
 
+    @SuppressLint("DiscouragedApi")
     private fun loadBitmap(drawableName: String): Bitmap? {
         val id = iconPackRes.getIdentifier(drawableName, "drawable", iconsPackPackageName)
         if (id > 0) {
-            val bitmap = iconPackRes.getDrawable(id, null)
+            val bitmap = ResourcesCompat.getDrawable(iconPackRes, id, null)
             if (bitmap is BitmapDrawable) {
                 return bitmap.bitmap
             }
@@ -193,6 +197,7 @@ class IconsHandler(val context: Context) {
     /**
      * Get or generate icon for an app
      */
+    @SuppressLint("DiscouragedApi")
     fun getBitmapForPackage(
         filename: String,
         componentName: ComponentName,
@@ -209,7 +214,7 @@ class IconsHandler(val context: Context) {
         if ((iconPack ?: iconsPackPackageName) == "default") {
             return mapOf(
                 "customIcon" to false,
-                "bitmap" to getDefaultAppDrawable(componentName, userHandle)!!.toBitmap()
+                "bitmap" to getDefaultAppDrawable(componentName, userHandle)?.toBitmap()
             )
         }
 
@@ -221,10 +226,11 @@ class IconsHandler(val context: Context) {
                 try {
                     return mapOf(
                         "customIcon" to true,
-                        "bitmap" to iconPackRes.getDrawable(id, null).toBitmap()
+                        "bitmap" to ResourcesCompat.getDrawable(iconPackRes, id, null)?.toBitmap()
                     )
                 } catch (e: Resources.NotFoundException) {
                     // Unable to load icon, keep going.
+
                     e.printStackTrace()
                 }
 
@@ -246,7 +252,7 @@ class IconsHandler(val context: Context) {
         }
 
         // if no support images in the icon pack return the bitmap itself
-        if (backImages.size == 0) {
+        if (backImages.isEmpty()) {
             return defaultDrawable.toBitmap()
         }
 
@@ -360,9 +366,9 @@ class IconsHandler(val context: Context) {
         if (!cacheDir.isDirectory)
             return
 
-        for (item in cacheDir.listFiles()) {
-            if (!item.delete()) {
-                log("Failed to delete file: " + item.absolutePath)
+        cacheDir.listFiles()?.forEach {
+            if (!it.delete()) {
+                log("Failed to delete file: " + it.absolutePath)
             }
         }
     }
